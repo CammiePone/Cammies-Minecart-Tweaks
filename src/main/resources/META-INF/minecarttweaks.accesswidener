@@ -1,0 +1,8 @@
+accessWidener v1 named
+
+accessible field net/minecraft/entity/vehicle/AbstractMinecartEntity clientYaw D
+accessible method net/minecraft/entity/vehicle/AbstractMinecartEntity getMaxOffRailSpeed ()D
+
+accessible method net/minecraft/entity/damage/DamageSource <init> (Ljava/lang/String;)V
+accessible method net/minecraft/entity/damage/DamageSource setBypassesArmor ()Lnet/minecraft/entity/damage/DamageSource;
+accessible method net/minecraft/entity/damage/DamageSource setUnblockable ()Lnet/minecraft/entity/damage/DamageSource;
