@@ -1,5 +1,6 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
+import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.StorageMinecartEntity;
 import net.minecraft.item.ItemStack;
@@ -15,9 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class StorageMinecartEntityMixin {
 	@Inject(method = "interact", at = @At("HEAD"), cancellable = true)
 	public void minecarttweaks$heckUMojang(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
-		ItemStack stack = player.getStackInHand(hand);
+		if(MinecartTweaks.getConfig().canLinkMinecarts) {
+			ItemStack stack = player.getStackInHand(hand);
 
-		if(player.isSneaking() && stack.isOf(Items.CHAIN))
-			info.setReturnValue(ActionResult.success(true));
+			if(player.isSneaking() && stack.isOf(Items.CHAIN))
+				info.setReturnValue(ActionResult.success(true));
+		}
 	}
 }

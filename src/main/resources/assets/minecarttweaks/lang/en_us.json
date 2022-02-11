@@ -1,3 +1,11 @@
 {
-	"death.attack.minecarttweaks.minecart": "%s didn't look both ways before crossing the rail line"
+	"minecarttweaks.cant_link_to_engine": "You can't make the caboose the engine of the engine!",
+	"death.attack.minecarttweaks.minecart": "%s didn't look both ways before crossing the rail line",
+
+	"text.autoconfig.minecarttweaks.title": "Cammie's Minecart Tweaks",
+	"text.autoconfig.minecarttweaks.option.minecartBaseSpeed": "Base Minecart Speed",
+	"text.autoconfig.minecarttweaks.option.furnaceSpeedMultiplier": "Furnace Minecart Speed Multiplier",
+	"text.autoconfig.minecarttweaks.option.minecartDamage": "Damage Dealt by Minecarts",
+	"text.autoconfig.minecarttweaks.option.canLinkMinecarts": "Can Minecarts be Linked by Chains?",
+	"text.autoconfig.minecarttweaks.option.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?"
 }

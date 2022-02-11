@@ -15,6 +15,9 @@
 		],
 		"main": [
 			"dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks"
+		],
+		"modmenu": [
+			"dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksModMenu"
 		]
 	},
 	"accessWidener": "META-INF/minecarttweaks.accesswidener",

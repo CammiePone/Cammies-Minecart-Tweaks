@@ -20,22 +20,36 @@ public class SyncMinecartPacket {
 
 	public static void send(PlayerEntity player, AbstractMinecartEntity parent, AbstractMinecartEntity child) {
 		PacketByteBuf buf = PacketByteBufs.create();
-		buf.writeInt(parent.getId());
+		buf.writeBoolean(parent != null);
+
+		if(parent != null)
+			buf.writeInt(parent.getId());
+
 		buf.writeInt(child.getId());
 		ServerSidePacketRegistryImpl.INSTANCE.sendToPlayer(player, ID, buf);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public static void handle(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender) {
-		int parentId = buf.readInt();
+		boolean parentExists = buf.readBoolean();
+		int parentId = -1;
+
+		if(parentExists)
+			parentId = buf.readInt();
+
 		int childId = buf.readInt();
 
+		int finalParentId = parentId;
 		client.submit(() -> {
 			if(client.world != null) {
 				ClientWorld world = client.world;
 
-				if(world.getEntityById(parentId) instanceof AbstractMinecartEntity parent && world.getEntityById(childId) instanceof Linkable linkable)
-					linkable.setLinkedParent(parent);
+				if(world.getEntityById(childId) instanceof Linkable linkable) {
+					if(parentExists && world.getEntityById(finalParentId) instanceof AbstractMinecartEntity parent)
+						linkable.setLinkedParent(parent);
+					else
+						linkable.setLinkedParent(null);
+				}
 			}
 		});
 	}

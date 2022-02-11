@@ -1,5 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
+import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
+import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
@@ -25,15 +27,17 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Inject(method = "getMaxOffRailSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
 		if(isLit())
-			info.setReturnValue(info.getReturnValueD() * 3);
+			info.setReturnValue(super.getMaxOffRailSpeed() * MinecartTweaks.getConfig().getFurnaceSpeedMultiplier());
 		else
-			info.setReturnValue(info.getReturnValueD() * 2);
+			info.setReturnValue(super.getMaxOffRailSpeed());
 	}
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
 	public void minecarttweaks$slowDown(BlockPos pos, BlockState state, CallbackInfo info) {
-		if(state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
+		if(MinecartTweaks.getConfig().shouldPoweredRailsStopFurnace && state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED))
 			fuel = 0;
-		}
+
+		if(MinecartHelper.shouldSlowDown(world, getX(), getY(), getZ()) && getVelocity().horizontalLength() > 0.5)
+			setVelocity(getVelocity().multiply(0.5D / MinecartTweaks.getConfig().getFurnaceSpeedMultiplier()));
 	}
 }
