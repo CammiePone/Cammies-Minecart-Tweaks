@@ -1,46 +1,49 @@
 package dev.cammiescorner.cammiesminecarttweaks.utils;
 
-import com.mojang.datafixers.util.Pair;
+import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class MinecartHelper {
-	public static boolean shouldSlowDown(World world, double x, double y, double z) {
-		boolean shouldSlowDown = false;
-		int i = MathHelper.floor(x);
-		int j = MathHelper.floor(y);
-		int k = MathHelper.floor(z);
+	public static boolean shouldSlowDown(AbstractMinecartEntity minecart, World world) {
+		boolean slowEm = false;
+		BlockPos pos = minecart.getBlockPos();
 
-		if(world.getBlockState(new BlockPos(i, j - 1, k)).isIn(BlockTags.RAILS))
-			--j;
+		if(world.getBlockState(pos.down()).isIn(BlockTags.RAILS))
+			pos = pos.down();
 
-		BlockPos pos = new BlockPos(i, j, k);
 		BlockState state = world.getBlockState(pos);
 
-		if(AbstractRailBlock.isRail(state)) {
-			Pair<Vec3i, Vec3i> rails = AbstractMinecartEntity.getAdjacentRailPositionsByShape(state.get(((AbstractRailBlock) state.getBlock()).getShapeProperty()));
-			BlockState railState1 = world.getBlockState(pos.add(rails.getFirst()));
-			BlockState railState2 = world.getBlockState(pos.add(rails.getSecond()));
+		if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock) {
+			Direction horizontal = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
+			int distance = (int) Math.ceil(MinecartTweaks.getConfig().getFurnaceSpeedMultiplier() * (MinecartTweaks.getConfig().getMinecartBaseSpeed() * 2));
 
-			if(railState1.isIn(BlockTags.RAILS) && railState1.getBlock() instanceof AbstractRailBlock rail) {
-				switch(railState1.get(rail.getShapeProperty())) {
-					case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> shouldSlowDown = true;
+			for(int h = 0; h < distance; h++) {
+				state = world.getBlockState(pos.mutableCopy().offset(horizontal, h));
+
+				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
+					switch(state.get(rails.getShapeProperty())) {
+						case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+					}
 				}
 			}
 
-			if(railState2.isIn(BlockTags.RAILS) && railState2.getBlock() instanceof AbstractRailBlock rail) {
-				switch(railState2.get(rail.getShapeProperty())) {
-					case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> shouldSlowDown = true;
+			for(int h = 0; h < distance; h++) {
+				state = world.getBlockState(pos.mutableCopy().offset(horizontal.getOpposite(), h));
+
+				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
+					switch(state.get(rails.getShapeProperty())) {
+						case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+					}
 				}
 			}
 		}
 
-		return shouldSlowDown;
+		return slowEm;
 	}
 }

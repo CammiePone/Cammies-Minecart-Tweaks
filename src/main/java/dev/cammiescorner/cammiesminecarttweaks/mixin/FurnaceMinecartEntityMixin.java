@@ -37,7 +37,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		if(MinecartTweaks.getConfig().shouldPoweredRailsStopFurnace && state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED))
 			fuel = 0;
 
-		if(MinecartHelper.shouldSlowDown(world, getX(), getY(), getZ()) && getVelocity().horizontalLength() > 0.5)
-			setVelocity(getVelocity().multiply(0.5D / MinecartTweaks.getConfig().getFurnaceSpeedMultiplier()));
+		if(MinecartHelper.shouldSlowDown(this, world) && getVelocity().horizontalLength() > MinecartTweaks.getConfig().getMinecartBaseSpeed())
+			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().getMinecartBaseSpeed()));
 	}
 }

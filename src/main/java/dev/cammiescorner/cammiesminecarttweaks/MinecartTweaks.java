@@ -29,6 +29,6 @@ public class MinecartTweaks implements ModInitializer {
 	}
 
 	public static DamageSource minecart(Entity entity) {
-		return new EntityDamageSource(MOD_ID + ".minecart", entity).setBypassesArmor().setUnblockable();
+		return new EntityDamageSource(MOD_ID + ".minecart", entity);
 	}
 }

@@ -1,7 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
-import dev.cammiescorner.cammiesminecarttweaks.packets.SyncMinecartPacket;
+import dev.cammiescorner.cammiesminecarttweaks.packets.SyncChainedMinecartPacket;
 import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -22,13 +22,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -40,7 +40,6 @@ import java.util.UUID;
 @Mixin(AbstractMinecartEntity.class)
 public abstract class AbstractMinecartEntityMixin extends Entity implements Linkable {
 	@Shadow public abstract Direction getMovementDirection();
-	@Shadow public abstract double getMaxOffRailSpeed();
 
 	@Unique private AbstractMinecartEntity linkedParent;
 	@Unique private UUID parentUuid;
@@ -58,22 +57,16 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$tick(CallbackInfo info) {
 		if(!world.isClient()) {
-			PlayerLookup.tracking(this).forEach(player -> SyncMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
+			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
 
 			if(linkedParent != null) {
-				double distance = getLinkedParent().distanceTo(this);
-				double parentSpeed = getLinkedParent().getVelocity().horizontalLength();
+				double distance = getLinkedParent().distanceTo(this) - 1;
 
 				if(distance <= 5) {
-					if(distance > 2) {
-						setVelocity(getLinkedParent().getPos().subtract(getPos()).multiply(Math.max(0.1, parentSpeed)));
-
-						if(distance > 2.5)
-							setVelocity(getVelocity().multiply(1.1));
-					}
-					else {
-						setVelocity(getVelocity().multiply(0.2));
-					}
+					if(distance > 1)
+						setVelocity(getLinkedParent().getPos().subtract(getPos()).multiply(distance));
+					else
+						setVelocity(Vec3d.ZERO);
 				}
 				else {
 					setLinkedParent(null);
@@ -86,9 +79,8 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 					dropStack(new ItemStack(Items.CHAIN));
 				}
 			}
-
-			if(MinecartHelper.shouldSlowDown(world, getX(), getY(), getZ()) && getVelocity().horizontalLength() > 0.5)
-				setVelocity(getVelocity().multiply(0.5D / MinecartTweaks.getConfig().getFurnaceSpeedMultiplier()));
+			else if(MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world) && getVelocity().horizontalLength() > MinecartTweaks.getConfig().getMinecartBaseSpeed())
+				setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().getMinecartBaseSpeed()));
 		}
 	}
 
@@ -98,7 +90,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 			dropStack(new ItemStack(Items.CHAIN));
 	}
 
-	@Inject(method = "collidesWith", at = @At("HEAD"))
+	@Inject(method = "collidesWith", at = @At("HEAD"), cancellable = true)
 	public void minecarttweaks$damageEntities(Entity other, CallbackInfoReturnable<Boolean> info) {
 		if(other instanceof AbstractMinecartEntity minecart)
 			minecart.setVelocity(getVelocity());
@@ -126,14 +118,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	@Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(DD)D"))
 	private double minecarttweaks$uncapSpeed(double garbo, double uncappedSpeed) {
 		return uncappedSpeed;
-	}
-
-	@ModifyArg(method = "moveOffRail", at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/util/math/Vec3d;multiply(D)Lnet/minecraft/util/math/Vec3d;",
-			ordinal = 1
-	))
-	public double minecarttweaks$goNyoomInAir(double d) {
-		return 1.15;
 	}
 
 	@Override

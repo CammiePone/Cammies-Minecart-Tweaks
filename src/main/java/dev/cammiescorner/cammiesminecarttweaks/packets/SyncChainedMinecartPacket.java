@@ -15,8 +15,8 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class SyncMinecartPacket {
-	public static final Identifier ID = MinecartTweaks.id("sync_attribute_overrides");
+public class SyncChainedMinecartPacket {
+	public static final Identifier ID = MinecartTweaks.id("sync_chained_minecart");
 
 	public static void send(PlayerEntity player, AbstractMinecartEntity parent, AbstractMinecartEntity child) {
 		PacketByteBuf buf = PacketByteBufs.create();
