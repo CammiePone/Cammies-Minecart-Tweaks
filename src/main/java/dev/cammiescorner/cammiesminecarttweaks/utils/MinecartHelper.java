@@ -1,6 +1,5 @@
 package dev.cammiescorner.cammiesminecarttweaks.utils;
 
-import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.RailShape;
@@ -22,9 +21,8 @@ public class MinecartHelper {
 
 		if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock) {
 			Direction horizontal = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
-			int distance = (int) Math.ceil(MinecartTweaks.getConfig().getFurnaceSpeedMultiplier() * (MinecartTweaks.getConfig().getMinecartBaseSpeed() * 2));
 
-			for(int h = 0; h < distance; h++) {
+			for(int h = 0; h < 3; h++) {
 				for(int y = 0; y < 6; y++) {
 					state = world.getBlockState(pos.mutableCopy().offset(horizontal, h).offset(Direction.Axis.Y, y - 3));
 
@@ -41,12 +39,19 @@ public class MinecartHelper {
 				}
 			}
 
-			for(int h = 0; h < distance; h++) {
-				state = world.getBlockState(pos.mutableCopy().offset(horizontal.getOpposite(), h));
+			for(int h = 0; h < 3; h++) {
+				for(int y = 0; y < 6; y++) {
+					state = world.getBlockState(pos.mutableCopy().offset(horizontal.getOpposite(), h).offset(Direction.Axis.Y, y - 3));
 
-				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
-					switch(state.get(rails.getShapeProperty())) {
-						case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+					if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
+						RailShape shape = state.get(rails.getShapeProperty());
+
+						if(shape.isAscending())
+							slowEm = true;
+
+						switch(shape) {
+							case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+						}
 					}
 				}
 			}

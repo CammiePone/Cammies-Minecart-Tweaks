@@ -12,10 +12,7 @@ import net.minecraft.client.render.entity.MinecartEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,22 +41,26 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 				float distanceX = (float) (startX - endX);
 				float distanceY = (float) (startY - endY);
 				float distanceZ = (float) (startZ - endZ);
+				float distance = child.distanceTo(parent);
 
-				double angle = Math.toDegrees(Math.atan2(endZ - startZ, endX - startX));
-				angle += Math.ceil( -angle / 360 ) * 360;
+				double hAngle = Math.toDegrees(Math.atan2(endZ - startZ, endX - startX));
+				hAngle += Math.ceil(-hAngle / 360) * 360;
 
-				renderChain(distanceX, distanceY, distanceZ, (float) angle, stack, provider, light);
+				double vAngle = Math.asin(distanceY / distance);
+
+				renderChain(distanceX, distanceY, distanceZ, (float) hAngle, (float) vAngle, stack, provider, light);
 			}
 		}
 	}
 
-	public void renderChain(float x, float y, float z, float angle, MatrixStack stack, VertexConsumerProvider provider, int light) {
+	public void renderChain(float x, float y, float z, float hAngle, float vAngle, MatrixStack stack, VertexConsumerProvider provider, int light) {
 		float squaredLength = x * x + y * y + z * z;
 		float length = MathHelper.sqrt(squaredLength) - 1F;
 
 		stack.push();
 		stack.translate(0, 0.2, 0);
-		stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-angle - 90));
+		stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-hAngle - 90));
+		stack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(-vAngle));
 		stack.translate(0, 0, 0.5);
 		stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
 		stack.push();

@@ -5,4 +5,7 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 public interface Linkable {
 	AbstractMinecartEntity getLinkedParent();
 	void setLinkedParent(AbstractMinecartEntity parent);
+
+	AbstractMinecartEntity getLinkedChild();
+	void setLinkedChild(AbstractMinecartEntity child);
 }

@@ -8,9 +8,8 @@ import me.shedaniel.autoconfig.annotation.Config;
 public class MinecartTweaksConfig implements ConfigData {
 	public double minecartBaseSpeed = 0.5;
 	public double furnaceSpeedMultiplier = 2D;
-	public float minecartDamage = 10F;
+	public float minecartDamage = 20F;
 	public boolean canLinkMinecarts = true;
-	public boolean shouldPoweredRailsStopFurnace = true;
 
 	public double getMinecartBaseSpeed() {
 		return Math.max(0.1, minecartBaseSpeed);
