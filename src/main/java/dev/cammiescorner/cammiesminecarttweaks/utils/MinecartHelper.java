@@ -3,6 +3,7 @@ package dev.cammiescorner.cammiesminecarttweaks.utils;
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
@@ -24,11 +25,18 @@ public class MinecartHelper {
 			int distance = (int) Math.ceil(MinecartTweaks.getConfig().getFurnaceSpeedMultiplier() * (MinecartTweaks.getConfig().getMinecartBaseSpeed() * 2));
 
 			for(int h = 0; h < distance; h++) {
-				state = world.getBlockState(pos.mutableCopy().offset(horizontal, h));
+				for(int y = 0; y < 6; y++) {
+					state = world.getBlockState(pos.mutableCopy().offset(horizontal, h).offset(Direction.Axis.Y, y - 3));
 
-				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
-					switch(state.get(rails.getShapeProperty())) {
-						case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+					if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
+						RailShape shape = state.get(rails.getShapeProperty());
+
+						if(shape.isAscending())
+							slowEm = true;
+
+						switch(shape) {
+							case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
+						}
 					}
 				}
 			}

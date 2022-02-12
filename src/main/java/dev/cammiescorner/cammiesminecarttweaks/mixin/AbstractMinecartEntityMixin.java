@@ -59,12 +59,24 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(!world.isClient()) {
 			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
 
-			if(linkedParent != null) {
+			if(getLinkedParent() != null) {
 				double distance = getLinkedParent().distanceTo(this) - 1;
 
 				if(distance <= 5) {
-					if(distance > 1)
-						setVelocity(getLinkedParent().getPos().subtract(getPos()).multiply(distance));
+					Vec3d direction = getLinkedParent().getPos().subtract(getPos()).normalize();
+
+					if(distance > 1) {
+						Vec3d parentVelocity = getLinkedParent().getVelocity();
+
+						if(getVelocity().horizontalLength() == 0)
+							setVelocity(direction.multiply(parentVelocity.length()));
+						else
+							setVelocity(getVelocity().normalize().multiply(parentVelocity.length()));
+
+						setVelocity(direction.multiply(distance));
+					}
+					else if(distance < 1)
+						setVelocity(direction.multiply(1D / -Math.max(0.001, distance)));
 					else
 						setVelocity(Vec3d.ZERO);
 				}

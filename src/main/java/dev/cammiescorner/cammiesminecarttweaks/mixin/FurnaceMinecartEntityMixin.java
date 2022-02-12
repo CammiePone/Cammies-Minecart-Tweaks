@@ -38,6 +38,6 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			fuel = 0;
 
 		if(MinecartHelper.shouldSlowDown(this, world) && getVelocity().horizontalLength() > MinecartTweaks.getConfig().getMinecartBaseSpeed())
-			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().getMinecartBaseSpeed()));
+			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().getMinecartBaseSpeed() - 0.1));
 	}
 }
