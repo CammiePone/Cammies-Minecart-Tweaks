@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin({FurnaceMinecartEntity.class, MinecartEntity.class, StorageMinecartEntity.class, CommandBlockMinecartEntity.class})
+@Mixin(value = {FurnaceMinecartEntity.class, MinecartEntity.class, StorageMinecartEntity.class, CommandBlockMinecartEntity.class}, priority = 0)
 public abstract class AllMinecartEntityMixin extends AbstractMinecartEntity {
 	protected AllMinecartEntityMixin(EntityType<?> entityType, World world) { super(entityType, world); }
 

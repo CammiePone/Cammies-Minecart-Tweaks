@@ -9,7 +9,11 @@ public class MinecartTweaksConfig implements ConfigData {
 	public double minecartBaseSpeed = 0.5;
 	public double furnaceSpeedMultiplier = 2D;
 	public float minecartDamage = 20F;
+	public int furnaceMaxBurnTime = 72000;
 	public boolean canLinkMinecarts = true;
+	public boolean useCampfireSmoke = true;
+	public boolean shouldPoweredRailsStopFurnace = true;
+	public boolean furnacesCanUseAllFuels = true;
 
 	public double getMinecartBaseSpeed() {
 		return Math.max(0.1, minecartBaseSpeed);

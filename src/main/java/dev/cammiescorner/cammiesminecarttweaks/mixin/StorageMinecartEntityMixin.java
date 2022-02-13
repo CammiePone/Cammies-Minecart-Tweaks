@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = StorageMinecartEntity.class, priority = 9999)
+@Mixin(StorageMinecartEntity.class)
 public class StorageMinecartEntityMixin {
 	@Inject(method = "interact", at = @At("HEAD"), cancellable = true)
 	public void minecarttweaks$heckUMojang(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
