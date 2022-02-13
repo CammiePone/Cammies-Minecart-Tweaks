@@ -14,14 +14,15 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecartEntityRenderer.class)
 public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEntity> extends EntityRenderer<T> {
-	private static final Identifier CHAIN_TEXTURE = MinecartTweaks.id("textures/entity/chain.png");
-	private static final RenderLayer CHAIN_LAYER = RenderLayer.getEntitySmoothCutout(CHAIN_TEXTURE);
+	@Unique private static final Identifier CHAIN_TEXTURE = MinecartTweaks.id("textures/entity/chain.png");
+	@Unique private static final RenderLayer CHAIN_LAYER = RenderLayer.getEntitySmoothCutout(CHAIN_TEXTURE);
 
 	protected MinecartEntityRendererMixin(EntityRendererFactory.Context ctx) { super(ctx); }
 
@@ -53,6 +54,7 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 		}
 	}
 
+	@Unique
 	public void renderChain(float x, float y, float z, float hAngle, float vAngle, MatrixStack stack, VertexConsumerProvider provider, int light) {
 		float squaredLength = x * x + y * y + z * z;
 		float length = MathHelper.sqrt(squaredLength) - 1F;

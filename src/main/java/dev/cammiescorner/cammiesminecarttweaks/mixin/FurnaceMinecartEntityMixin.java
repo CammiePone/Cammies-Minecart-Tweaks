@@ -42,7 +42,6 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Shadow public double pushX;
 	@Shadow public double pushZ;
 	@Shadow @Final @Mutable private static Ingredient ACCEPTABLE_FUEL;
-
 	@Shadow public abstract ActionResult interact(PlayerEntity player, Hand hand);
 
 	@Unique private int altFuel;
