@@ -3,12 +3,16 @@
 	"death.attack.minecarttweaks.minecart": "%s didn't look both ways before crossing the rail line",
 
 	"text.autoconfig.minecarttweaks.title": "Cammie's Minecart Tweaks",
-	"text.autoconfig.minecarttweaks.option.minecartBaseSpeed": "Base Minecart Speed",
-	"text.autoconfig.minecarttweaks.option.furnaceSpeedMultiplier": "Furnace Minecart Speed Multiplier",
-	"text.autoconfig.minecarttweaks.option.minecartDamage": "Damage Dealt by Minecarts",
-	"text.autoconfig.minecarttweaks.option.furnaceMaxBurnTime": "Maximum time a Minecart Furnace can run (in ticks)",
-	"text.autoconfig.minecarttweaks.option.canLinkMinecarts": "Can Minecarts be Linked by Chains?",
-	"text.autoconfig.minecarttweaks.option.useCampfireSmoke": "Should Minecarts produce Campfire Smoke particles?",
-	"text.autoconfig.minecarttweaks.option.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?",
-	"text.autoconfig.minecarttweaks.option.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?"
+	"text.autoconfig.minecarttweaks.option.clientTweaks": "Client Tweaks (Changes Only Needed on Client)",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.useCampfireSmoke": "Should Minecarts produce Campfire Smoke particles?",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.playerViewIsLocked": "Should the player's view be locked when riding a Minecart?",
+
+	"text.autoconfig.minecarttweaks.option.commonTweaks": "Common Tweaks (Changes Needed on Client & Server)",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.minecartBaseSpeed": "Base Minecart Speed",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.furnaceSpeedMultiplier": "Furnace Minecart Speed Multiplier",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.minecartDamage": "Damage Dealt by Minecarts",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.furnaceMaxBurnTime": "Maximum time a Minecart Furnace can run (in ticks)",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.canLinkMinecarts": "Can Minecarts be Linked by Chains?",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?",
+	"text.autoconfig.minecarttweaks.option.commonTweaks.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?"
 }

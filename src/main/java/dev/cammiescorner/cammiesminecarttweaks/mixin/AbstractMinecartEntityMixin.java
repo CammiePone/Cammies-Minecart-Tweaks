@@ -21,6 +21,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +41,7 @@ import java.util.UUID;
 public abstract class AbstractMinecartEntityMixin extends Entity implements Linkable {
 	@Shadow public abstract Direction getMovementDirection();
 
+	@Shadow public double clientYaw;
 	@Unique private AbstractMinecartEntity linkedParent;
 	@Unique private AbstractMinecartEntity linkedChild;
 	@Unique private UUID parentUuid;
@@ -96,6 +98,19 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 					setLinkedChild(null);
 			}
 		}
+		else {
+			if(MinecartTweaks.getConfig().clientTweaks.playerViewIsLocked) {
+				Vec3d directionVec = getVelocity().normalize();
+
+				if(directionVec.length() > 0) {
+					float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(directionVec.getZ(), directionVec.getX())) - 90);
+
+					for(Entity passenger : getPassengerList()) {
+						passenger.setYaw(MathHelper.clampAngle(passenger.getYaw(), yaw, 90));
+					}
+				}
+			}
+		}
 	}
 
 	@Inject(method = "dropItems", at = @At("HEAD"))
@@ -109,7 +124,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
 			minecart.setVelocity(getVelocity());
 
-		float damage = MinecartTweaks.getConfig().minecartDamage;
+		float damage = MinecartTweaks.getConfig().commonTweaks.minecartDamage;
 
 		if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
 			living.damage(MinecartTweaks.minecart(this), damage);
@@ -143,7 +158,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(MinecartTweaks.getConfig().canLinkMinecarts) {
+		if(MinecartTweaks.getConfig().commonTweaks.canLinkMinecarts) {
 			ItemStack stack = player.getStackInHand(hand);
 
 			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {

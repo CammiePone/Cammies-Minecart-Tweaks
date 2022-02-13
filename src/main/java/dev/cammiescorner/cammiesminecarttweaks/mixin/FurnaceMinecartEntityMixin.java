@@ -61,7 +61,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
 	public void minecarttweaks$slowDown(BlockPos pos, BlockState state, CallbackInfo info) {
-		if(MinecartTweaks.getConfig().shouldPoweredRailsStopFurnace) {
+		if(MinecartTweaks.getConfig().commonTweaks.shouldPoweredRailsStopFurnace) {
 			if(altFuel <= 0 && fuel > 0) {
 				if(state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 					altPushX = pushX;
@@ -98,7 +98,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@Inject(method = "interact", at = @At("HEAD"))
 	public void minecarttweaks$addOtherFuels(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
-		if(MinecartTweaks.getConfig().furnacesCanUseAllFuels) {
+		if(MinecartTweaks.getConfig().commonTweaks.furnacesCanUseAllFuels) {
 			ItemStack stack = player.getStackInHand(hand);
 			Map<Item, Integer> fuels = AbstractFurnaceBlockEntity.createFuelTimeMap();
 
@@ -117,7 +117,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 					world.playSound(player, player.getBlockPos(), soundEvent, SoundCategory.BLOCKS, 1.0f, 1.0f);
 				}
 
-				fuel = (int) Math.min(MinecartTweaks.getConfig().furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
+				fuel = (int) Math.min(MinecartTweaks.getConfig().commonTweaks.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
 			}
 
 			ACCEPTABLE_FUEL = Ingredient.empty();
@@ -129,14 +129,14 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@ModifyConstant(method = "interact", constant = @Constant(intValue = 32000))
 	public int minecarttweaks$maxBurnTime(int maxBurnTime) {
-		return MinecartTweaks.getConfig().furnaceMaxBurnTime;
+		return MinecartTweaks.getConfig().commonTweaks.furnaceMaxBurnTime;
 	}
 
 	@ModifyArgs(method = "tick", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"
 	))
 	public void minecarttweaks$changeSmokeParticle(Args args) {
-		if(MinecartTweaks.getConfig().useCampfireSmoke)
+		if(MinecartTweaks.getConfig().clientTweaks.useCampfireSmoke)
 			args.set(0, ParticleTypes.CAMPFIRE_COSY_SMOKE);
 
 		args.set(1, getX() + (random.nextFloat() - 0.5));
