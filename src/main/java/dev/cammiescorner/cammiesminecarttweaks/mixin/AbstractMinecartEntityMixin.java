@@ -102,11 +102,17 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 			if(MinecartTweaks.getConfig().clientTweaks.playerViewIsLocked) {
 				Vec3d directionVec = getVelocity().normalize();
 
-				if(directionVec.length() > 0) {
+				if(getVelocity().length() > MinecartTweaks.getConfig().getMinecartBaseSpeed() * 0.5) {
 					float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(directionVec.getZ(), directionVec.getX())) - 90);
 
 					for(Entity passenger : getPassengerList()) {
-						passenger.setYaw(MathHelper.clampAngle(passenger.getYaw(), yaw, 90));
+						float wantedYaw = MathHelper.wrapDegrees(MathHelper.clampAngle(passenger.getYaw(), yaw, 70) - passenger.getYaw());
+						float steps = Math.abs(wantedYaw) / 5F;
+
+						if(wantedYaw >= steps)
+							passenger.setYaw(passenger.getYaw() + steps);
+						if(wantedYaw <= -steps)
+							passenger.setYaw(passenger.getYaw() - steps);
 					}
 				}
 			}
