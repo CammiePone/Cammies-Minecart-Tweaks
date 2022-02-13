@@ -106,7 +106,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 					float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(directionVec.getZ(), directionVec.getX())) - 90);
 
 					for(Entity passenger : getPassengerList()) {
-						float wantedYaw = MathHelper.wrapDegrees(MathHelper.clampAngle(passenger.getYaw(), yaw, 70) - passenger.getYaw());
+						float wantedYaw = MathHelper.wrapDegrees(MathHelper.clampAngle(passenger.getYaw(), yaw, MinecartTweaks.getConfig().clientTweaks.maxViewAngle) - passenger.getYaw());
 						float steps = Math.abs(wantedYaw) / 5F;
 
 						if(wantedYaw >= steps)

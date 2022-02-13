@@ -3,6 +3,7 @@ package dev.cammiescorner.cammiesminecarttweaks.integration;
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.BoundedDiscrete;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.CollapsibleObject;
 
 @Config(name = MinecartTweaks.MOD_ID)
@@ -21,6 +22,7 @@ public class MinecartTweaksConfig implements ConfigData {
 	public static class ClientTweaks {
 		public boolean useCampfireSmoke = true;
 		public boolean playerViewIsLocked = false;
+		@BoundedDiscrete(max = 90L) public int maxViewAngle = 90;
 	}
 
 	public static class CommonTweaks {
