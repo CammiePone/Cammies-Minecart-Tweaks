@@ -10,7 +10,8 @@
 		"StorageMinecartEntityMixin"
 	],
 	"client": [
-		"client.MinecartEntityRendererMixin"
+		"client.MinecartEntityRendererMixin",
+		"client.SplashTextResourceSupplierMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
