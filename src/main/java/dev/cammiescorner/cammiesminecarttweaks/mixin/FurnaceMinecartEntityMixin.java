@@ -66,12 +66,12 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 				if(state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 					altPushX = pushX;
 					altPushZ = pushZ;
-					altFuel = fuel;
+					altFuel += fuel;
 					fuel = 0;
 				}
 			}
 			else if(!state.isOf(Blocks.POWERED_RAIL) || (state.isOf(Blocks.POWERED_RAIL) && state.get(PoweredRailBlock.POWERED))) {
-				fuel = altFuel;
+				fuel += altFuel;
 				altFuel = 0;
 				pushX = altPushX;
 				pushZ = altPushZ;
