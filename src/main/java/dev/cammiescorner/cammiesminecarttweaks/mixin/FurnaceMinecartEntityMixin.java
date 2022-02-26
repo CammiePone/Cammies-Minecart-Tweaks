@@ -92,8 +92,9 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			train.forEach(child -> shouldSlowDown.set(shouldSlowDown.get() || MinecartHelper.shouldSlowDown((AbstractMinecartEntity) child, world)));
 		}
 
-		if(shouldSlowDown.get() && getVelocity().length() > MinecartTweaks.getConfig().getMinecartBaseSpeed())
-			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().getMinecartBaseSpeed()));
+
+		if(shouldSlowDown.get() && getVelocity().length() > MinecartTweaks.getConfig().getMaxSpeedAroundTurns())
+			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().	getMaxSpeedAroundTurns()));
 	}
 
 	@Inject(method = "interact", at = @At("HEAD"))
@@ -152,15 +153,20 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		return 1;
 	}
 
-	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
+	@Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
 	public void minecarttweaks$readNbt(NbtCompound nbt, CallbackInfo info) {
+		fuel = nbt.getInt("RealFuel");
 		altFuel = nbt.getInt("AltFuel");
 		altPushX = nbt.getDouble("AltPushX");
 		altPushZ = nbt.getDouble("AltPushZ");
 	}
 
-	@Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))
+	@Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
 	public void minecarttweaks$writeNbt(NbtCompound nbt, CallbackInfo info) {
+		if(fuel > Short.MAX_VALUE)
+			nbt.putShort("Fuel", Short.MAX_VALUE);
+
+		nbt.putInt("RealFuel", fuel);
 		nbt.putInt("AltFuel", altFuel);
 		nbt.putDouble("AltPushX", altPushX);
 		nbt.putDouble("AltPushZ", altPushZ);

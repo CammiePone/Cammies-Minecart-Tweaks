@@ -19,6 +19,10 @@ public class MinecartTweaksConfig implements ConfigData {
 		return Math.max(0.1, commonTweaks.furnaceSpeedMultiplier);
 	}
 
+	public double getMaxSpeedAroundTurns() {
+		return Math.min(1, commonTweaks.maxSpeedAroundTurns);
+	}
+
 	public static class ClientTweaks {
 		public boolean useCampfireSmoke = true;
 		public boolean playerViewIsLocked = false;
@@ -26,8 +30,9 @@ public class MinecartTweaksConfig implements ConfigData {
 	}
 
 	public static class CommonTweaks {
-		public double minecartBaseSpeed = 0.5;
 		public double furnaceSpeedMultiplier = 2D;
+		public double minecartBaseSpeed = 0.5D;
+		public double maxSpeedAroundTurns = 0.4D;
 		public float minecartDamage = 20F;
 		public int furnaceMaxBurnTime = 72000;
 		public boolean canLinkMinecarts = true;

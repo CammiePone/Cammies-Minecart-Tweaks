@@ -1,5 +1,6 @@
 package dev.cammiescorner.cammiesminecarttweaks.utils;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.RailShape;
@@ -7,52 +8,65 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MinecartHelper {
 	public static boolean shouldSlowDown(AbstractMinecartEntity minecart, World world) {
+		int velocity = MathHelper.ceil(minecart.getVelocity().horizontalLength());
 		boolean slowEm = false;
-		BlockPos pos = minecart.getBlockPos();
+		Direction direction = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
+		BlockPos minecartPos = minecart.getBlockPos();
+		Vec3i pain = new Vec3i(minecartPos.getX(), 0, minecartPos.getZ());
+		BlockPos.Mutable pos = new BlockPos.Mutable();
+		List<Vec3i> poses = new ArrayList<>();
 
-		if(world.getBlockState(pos.down()).isIn(BlockTags.RAILS))
-			pos = pos.down();
+		poses.add(minecartPos);
 
-		BlockState state = world.getBlockState(pos);
+		for(int i = 0; i < poses.size(); i++) {
+			pos.set(poses.get(i));
+			int distance = pain.getManhattanDistance(new Vec3i(pos.getX(), 0, pos.getZ()));
 
-		if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock) {
-			Direction horizontal = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
+			if(distance > velocity)
+				break;
 
-			for(int h = 0; h < 3; h++) {
-				for(int y = 0; y < 6; y++) {
-					state = world.getBlockState(pos.mutableCopy().offset(horizontal, h).offset(Direction.Axis.Y, y - 3));
+			if(world.getBlockState(pos.down()).isIn(BlockTags.RAILS))
+				pos.move(0, -1, 0);
 
-					if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
-						RailShape shape = state.get(rails.getShapeProperty());
+			BlockState state = world.getBlockState(pos);
 
-						if(shape.isAscending())
-							slowEm = true;
+			if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
+				RailShape shape = state.get(rails.getShapeProperty());
 
-						switch(shape) {
-							case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
-						}
-					}
+				if(shape != RailShape.NORTH_SOUTH && shape != RailShape.EAST_WEST) {
+					slowEm = true;
+					break;
 				}
-			}
 
-			for(int h = 0; h < 3; h++) {
-				for(int y = 0; y < 6; y++) {
-					state = world.getBlockState(pos.mutableCopy().offset(horizontal.getOpposite(), h).offset(Direction.Axis.Y, y - 3));
+				Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(shape);
+				Vec3i first = pair.getFirst().add(pos);
+				Vec3i second = pair.getSecond().add(pos);
 
-					if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
-						RailShape shape = state.get(rails.getShapeProperty());
+				if(distance < 2) {
+					if(!poses.contains(first))
+						poses.add(first);
+					if(!poses.contains(second))
+						poses.add(second);
 
-						if(shape.isAscending())
-							slowEm = true;
+					continue;
+				}
 
-						switch(shape) {
-							case NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST -> slowEm = true;
-						}
-					}
+				if((shape == RailShape.NORTH_SOUTH && direction == Direction.NORTH) || (shape == RailShape.EAST_WEST && direction == Direction.WEST)) {
+					if(!poses.contains(first))
+						poses.add(first);
+				}
+				else {
+					if(!poses.contains(second))
+						poses.add(second);
 				}
 			}
 		}
