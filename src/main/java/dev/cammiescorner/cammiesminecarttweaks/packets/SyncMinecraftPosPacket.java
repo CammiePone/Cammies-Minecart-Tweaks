@@ -10,12 +10,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public class SyncMinecraftsPacket {
+public class SyncMinecraftPosPacket {
 	public static final Identifier ID = MinecartTweaks.id("sync_minecart_pos");
 
 	public static void send(PlayerEntity player, AbstractMinecartEntity minecart) {
@@ -47,13 +46,6 @@ public class SyncMinecraftsPacket {
 		client.submit(() -> {
 			if(client.world != null) {
 				World world = client.world;
-
-				if(world.getEntityById(minecartId) instanceof MinecartEntity minecart) {
-					minecart.setPosition(posX, posY, posZ);
-					minecart.setVelocity(velX, velY, velZ);
-					minecart.setYaw(yaw);
-					minecart.setPitch(pitch);
-				}
 			}
 		});
 	}

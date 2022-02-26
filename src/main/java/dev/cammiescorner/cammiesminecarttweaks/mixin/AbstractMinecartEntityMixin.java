@@ -40,8 +40,6 @@ import java.util.UUID;
 @Mixin(AbstractMinecartEntity.class)
 public abstract class AbstractMinecartEntityMixin extends Entity implements Linkable {
 	@Shadow public abstract Direction getMovementDirection();
-
-	@Shadow public double clientYaw;
 	@Unique private AbstractMinecartEntity linkedParent;
 	@Unique private AbstractMinecartEntity linkedChild;
 	@Unique private UUID parentUuid;
@@ -167,7 +165,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(MinecartTweaks.getConfig().commonTweaks.canLinkMinecarts) {
 			ItemStack stack = player.getStackInHand(hand);
 
-			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {
+			if(player.isSneaking() && stack.isOf(Items.CHAIN) && getLinkedChild() == null) {
 				if(world instanceof ServerWorld server) {
 					NbtCompound nbt = stack.getOrCreateNbt();
 
@@ -181,9 +179,13 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 								train.add(linkable);
 							}
 
-							if(train.contains(this))
+							if(train.contains(this)) {
 								player.sendMessage(new TranslatableText(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
+							}
 							else {
+								if(getLinkedParent() != null)
+									((Linkable) getLinkedParent()).setLinkedChild(null);
+
 								setLinkedParent(parent);
 								((Linkable) parent).setLinkedChild((AbstractMinecartEntity) (Object) this);
 							}
@@ -201,6 +203,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 							stack.decrement(1);
 
 						nbt.remove("ParentEntity");
+
 						if(nbt.isEmpty())
 							stack.setNbt(null);
 					}

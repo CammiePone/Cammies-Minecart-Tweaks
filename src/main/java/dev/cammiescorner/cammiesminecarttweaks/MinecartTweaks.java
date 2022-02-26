@@ -16,7 +16,6 @@ public class MinecartTweaks implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-
 		AutoConfig.register(MinecartTweaksConfig.class, JanksonConfigSerializer::new);
 		configHolder = AutoConfig.getConfigHolder(MinecartTweaksConfig.class);
 	}
