@@ -175,7 +175,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 							Set<Linkable> train = new HashSet<>();
 							train.add(linkable);
 
-							while((linkable = (Linkable) linkable.getLinkedParent()) instanceof Linkable) {
+							while((linkable = (Linkable) linkable.getLinkedParent()) instanceof Linkable && !train.contains(linkable)) {
 								train.add(linkable);
 							}
 
