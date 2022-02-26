@@ -85,7 +85,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			Set<Linkable> train = new HashSet<>();
 			train.add(linkable);
 
-			while((linkable = (Linkable) linkable.getLinkedChild()) instanceof Linkable) {
+			while((linkable = (Linkable) linkable.getLinkedChild()) instanceof Linkable && !train.contains(linkable)) {
 				train.add(linkable);
 			}
 
