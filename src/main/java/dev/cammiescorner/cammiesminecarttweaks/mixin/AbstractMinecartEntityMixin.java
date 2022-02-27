@@ -52,7 +52,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(getLinkedParent() != null)
 			info.setReturnValue(getLinkedParent().getMaxOffRailSpeed());
 		else
-			info.setReturnValue(MinecartTweaks.getConfig().getMinecartBaseSpeed());
+			info.setReturnValue(MinecartTweaks.getConfig().getOtherMinecartSpeed());
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
@@ -100,7 +100,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 			if(MinecartTweaks.getConfig().clientTweaks.playerViewIsLocked) {
 				Vec3d directionVec = getVelocity().normalize();
 
-				if(getVelocity().length() > MinecartTweaks.getConfig().getMinecartBaseSpeed() * 0.5) {
+				if(getVelocity().length() > MinecartTweaks.getConfig().getOtherMinecartSpeed() * 0.5) {
 					float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(directionVec.getZ(), directionVec.getX())) - 90);
 
 					for(Entity passenger : getPassengerList()) {
@@ -128,7 +128,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
 			minecart.setVelocity(getVelocity());
 
-		float damage = MinecartTweaks.getConfig().commonTweaks.minecartDamage;
+		float damage = MinecartTweaks.getConfig().serverTweaks.minecartDamage;
 
 		if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
 			living.damage(MinecartTweaks.minecart(this), damage);
@@ -162,7 +162,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(MinecartTweaks.getConfig().commonTweaks.canLinkMinecarts) {
+		if(MinecartTweaks.getConfig().serverTweaks.canLinkMinecarts) {
 			ItemStack stack = player.getStackInHand(hand);
 
 			if(player.isSneaking() && stack.isOf(Items.CHAIN) && getLinkedChild() == null) {

@@ -54,14 +54,14 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Inject(method = "getMaxOffRailSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
 		if(isLit())
-			info.setReturnValue(super.getMaxOffRailSpeed() * MinecartTweaks.getConfig().getFurnaceSpeedMultiplier());
+			info.setReturnValue(MinecartTweaks.getConfig().getFurnaceMinecartSpeed());
 		else
 			info.setReturnValue(super.getMaxOffRailSpeed());
 	}
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
 	public void minecarttweaks$slowDown(BlockPos pos, BlockState state, CallbackInfo info) {
-		if(MinecartTweaks.getConfig().commonTweaks.shouldPoweredRailsStopFurnace) {
+		if(MinecartTweaks.getConfig().serverTweaks.shouldPoweredRailsStopFurnace) {
 			if(altFuel <= 0 && fuel > 0) {
 				if(state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 					altPushX = pushX;
@@ -99,7 +99,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@Inject(method = "interact", at = @At("HEAD"))
 	public void minecarttweaks$addOtherFuels(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
-		if(MinecartTweaks.getConfig().commonTweaks.furnacesCanUseAllFuels) {
+		if(MinecartTweaks.getConfig().serverTweaks.furnacesCanUseAllFuels) {
 			ItemStack stack = player.getStackInHand(hand);
 			Map<Item, Integer> fuels = AbstractFurnaceBlockEntity.createFuelTimeMap();
 
@@ -118,7 +118,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 					world.playSound(player, player.getBlockPos(), soundEvent, SoundCategory.BLOCKS, 1.0f, 1.0f);
 				}
 
-				fuel = (int) Math.min(MinecartTweaks.getConfig().commonTweaks.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
+				fuel = (int) Math.min(MinecartTweaks.getConfig().serverTweaks.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
 			}
 
 			ACCEPTABLE_FUEL = Ingredient.empty();
@@ -130,7 +130,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@ModifyConstant(method = "interact", constant = @Constant(intValue = 32000))
 	public int minecarttweaks$maxBurnTime(int maxBurnTime) {
-		return MinecartTweaks.getConfig().commonTweaks.furnaceMaxBurnTime;
+		return MinecartTweaks.getConfig().serverTweaks.furnaceMaxBurnTime;
 	}
 
 	@ModifyArgs(method = "tick", at = @At(value = "INVOKE",

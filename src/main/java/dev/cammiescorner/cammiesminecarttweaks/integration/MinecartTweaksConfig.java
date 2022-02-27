@@ -9,18 +9,18 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.CollapsibleObject;
 @Config(name = MinecartTweaks.MOD_ID)
 public class MinecartTweaksConfig implements ConfigData {
 	@CollapsibleObject public ClientTweaks clientTweaks = new ClientTweaks();
-	@CollapsibleObject public CommonTweaks commonTweaks = new CommonTweaks();
+	@CollapsibleObject public ServerTweaks serverTweaks = new ServerTweaks();
 
-	public double getMinecartBaseSpeed() {
-		return Math.max(0.1, commonTweaks.minecartBaseSpeed);
+	public double getFurnaceMinecartSpeed() {
+		return Math.max(0.1, serverTweaks.furnaceMinecartSpeed * 0.05);
 	}
 
-	public double getFurnaceSpeedMultiplier() {
-		return Math.max(0.1, commonTweaks.furnaceSpeedMultiplier);
+	public double getOtherMinecartSpeed() {
+		return Math.max(0.1, serverTweaks.otherMinecartSpeed * 0.05);
 	}
 
 	public double getMaxSpeedAroundTurns() {
-		return Math.min(1, commonTweaks.maxSpeedAroundTurns);
+		return Math.min(1, serverTweaks.maxSpeedAroundTurns * 0.05);
 	}
 
 	public static class ClientTweaks {
@@ -29,10 +29,10 @@ public class MinecartTweaksConfig implements ConfigData {
 		@BoundedDiscrete(max = 90L) public int maxViewAngle = 90;
 	}
 
-	public static class CommonTweaks {
-		public double furnaceSpeedMultiplier = 2D;
-		public double minecartBaseSpeed = 0.5D;
-		public double maxSpeedAroundTurns = 0.4D;
+	public static class ServerTweaks {
+		public double furnaceMinecartSpeed = 40D;
+		public double otherMinecartSpeed = 10D;
+		public double maxSpeedAroundTurns = 8D;
 		public float minecartDamage = 20F;
 		public int furnaceMaxBurnTime = 72000;
 		public boolean canLinkMinecarts = true;
