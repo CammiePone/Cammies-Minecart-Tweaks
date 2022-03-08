@@ -17,12 +17,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ChunkTicketType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -48,6 +51,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Unique private double altPushX;
 	@Unique private double altPushZ;
 	@Unique private static final Ingredient OLD_ACCEPTABLE_FUEL = ACCEPTABLE_FUEL;
+	@Unique private final Set<AbstractMinecartEntity> train = new HashSet<>();
 
 	protected FurnaceMinecartEntityMixin(EntityType<?> entityType, World world) { super(entityType, world); }
 
@@ -57,6 +61,12 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			info.setReturnValue(MinecartTweaks.getConfig().getFurnaceMinecartSpeed());
 		else
 			info.setReturnValue(super.getMaxOffRailSpeed());
+	}
+
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void minecarttweaks$loadChunks(CallbackInfo info) {
+		if(MinecartTweaks.getConfig().serverTweaks.furnaceMinecartsLoadChunks && world instanceof ServerWorld server && fuel > 0)
+			server.getChunkManager().addTicket(ChunkTicketType.PLAYER, ChunkSectionPos.from(this).toChunkPos(), 3, getChunkPos());
 	}
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
@@ -79,17 +89,17 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		}
 
 		AtomicBoolean shouldSlowDown = new AtomicBoolean(MinecartHelper.shouldSlowDown(this, world));
+		train.add(this);
 
 		if(getLinkedChild() != null) {
 			Linkable linkable = (Linkable) getLinkedChild();
-			Set<Linkable> train = new HashSet<>();
-			train.add(linkable);
+			train.add(getLinkedChild());
 
 			while((linkable = (Linkable) linkable.getLinkedChild()) instanceof Linkable && !train.contains(linkable)) {
-				train.add(linkable);
+				train.add(linkable.getLinkedChild());
 			}
 
-			train.forEach(child -> shouldSlowDown.set(shouldSlowDown.get() || MinecartHelper.shouldSlowDown((AbstractMinecartEntity) child, world)));
+			train.forEach(child -> shouldSlowDown.set(shouldSlowDown.get() || MinecartHelper.shouldSlowDown(child, world)));
 		}
 
 

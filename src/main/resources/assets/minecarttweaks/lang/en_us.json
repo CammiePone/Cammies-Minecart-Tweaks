@@ -16,5 +16,6 @@
 	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMaxBurnTime": "Maximum time a Minecart Furnace can run (in ticks)",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.canLinkMinecarts": "Can Minecarts be Linked by Chains?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?",
-	"text.autoconfig.minecarttweaks.option.serverTweaks.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?"
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartsLoadChunks": "Should Furnace Minecarts be able to load chunks?"
 }
