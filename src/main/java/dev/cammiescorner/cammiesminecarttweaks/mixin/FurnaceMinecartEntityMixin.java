@@ -122,7 +122,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().	getMaxSpeedAroundTurns()));
 	}
 
-	@Inject(method = "interact", at = @At("HEAD"))
+	@Inject(method = "interact", at = @At("HEAD"), cancellable = true)
 	public void minecarttweaks$addOtherFuels(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
 		if(MinecartTweaks.getConfig().serverTweaks.furnacesCanUseAllFuels) {
 			ItemStack stack = player.getStackInHand(hand);

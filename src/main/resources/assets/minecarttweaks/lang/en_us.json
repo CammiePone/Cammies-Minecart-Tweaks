@@ -5,6 +5,7 @@
 	"text.autoconfig.minecarttweaks.title": "Cammie's Minecart Tweaks",
 	"text.autoconfig.minecarttweaks.option.clientTweaks": "Client Tweaks (Changes Only Needed on Client)",
 	"text.autoconfig.minecarttweaks.option.clientTweaks.useCampfireSmoke": "Should Furnace Minecarts produce Campfire Smoke particles?",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.dontEatEnchantedItems": "Prevent Furnace Minecarts from burning Enchanted items?",
 	"text.autoconfig.minecarttweaks.option.clientTweaks.playerViewIsLocked": "Should the player's view be locked when riding a Minecart?",
 	"text.autoconfig.minecarttweaks.option.clientTweaks.maxViewAngle": "Maximum view angle if the player's view is locked",
 

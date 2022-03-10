@@ -25,6 +25,7 @@ public class MinecartTweaksConfig implements ConfigData {
 
 	public static class ClientTweaks {
 		public boolean useCampfireSmoke = true;
+		public boolean dontEatEnchantedItems = true;
 		public boolean playerViewIsLocked = false;
 		@BoundedDiscrete(max = 90L) public int maxViewAngle = 90;
 	}
