@@ -91,10 +91,10 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 				if(getLinkedParent().isRemoved())
 					setLinkedParent(null);
-
-				if(getLinkedChild() != null && getLinkedChild().isRemoved())
-					setLinkedChild(null);
 			}
+
+			if(getLinkedChild() != null && getLinkedChild().isRemoved())
+				setLinkedChild(null);
 		}
 		else {
 			if(MinecartTweaks.getConfig().clientTweaks.playerViewIsLocked) {

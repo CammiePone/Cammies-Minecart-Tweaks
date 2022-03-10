@@ -25,6 +25,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.*;
@@ -52,8 +53,14 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Unique private double altPushZ;
 	@Unique private static final Ingredient OLD_ACCEPTABLE_FUEL = ACCEPTABLE_FUEL;
 	@Unique private final Set<AbstractMinecartEntity> train = new HashSet<>();
+	@Unique private ChunkPos prevChunkPos;
 
 	protected FurnaceMinecartEntityMixin(EntityType<?> entityType, World world) { super(entityType, world); }
+
+	@Inject(method = "<init>(Lnet/minecraft/world/World;DDD)V", at = @At("TAIL"))
+	public void minecarttweaks$initPrevChunPos(World world, double x, double y, double z, CallbackInfo info) {
+		prevChunkPos = getChunkPos();
+	}
 
 	@Inject(method = "getMaxOffRailSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
@@ -65,8 +72,16 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$loadChunks(CallbackInfo info) {
-		if(MinecartTweaks.getConfig().serverTweaks.furnaceMinecartsLoadChunks && world instanceof ServerWorld server && fuel > 0)
-			server.getChunkManager().addTicket(ChunkTicketType.PLAYER, ChunkSectionPos.from(this).toChunkPos(), 3, getChunkPos());
+		if(MinecartTweaks.getConfig().serverTweaks.furnaceMinecartsLoadChunks && world instanceof ServerWorld server) {
+			ChunkPos currentChunkPos = ChunkSectionPos.from(this).toChunkPos();
+
+			if(fuel > 0)
+				server.getChunkManager().addTicket(ChunkTicketType.PLAYER, currentChunkPos, 3, getChunkPos());
+			if(!currentChunkPos.equals(prevChunkPos) || fuel < 0)
+				server.getChunkManager().removeTicket(ChunkTicketType.PLAYER, prevChunkPos, 3, getChunkPos());
+
+			prevChunkPos = currentChunkPos;
+		}
 	}
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
@@ -169,6 +184,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		altFuel = nbt.getInt("AltFuel");
 		altPushX = nbt.getDouble("AltPushX");
 		altPushZ = nbt.getDouble("AltPushZ");
+		prevChunkPos = new ChunkPos(nbt.getLong("PrevChunkPos"));
 	}
 
 	@Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -180,5 +196,6 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		nbt.putInt("AltFuel", altFuel);
 		nbt.putDouble("AltPushX", altPushX);
 		nbt.putDouble("AltPushZ", altPushZ);
+		nbt.putLong("PrevChunkPos", prevChunkPos.toLong());
 	}
 }
