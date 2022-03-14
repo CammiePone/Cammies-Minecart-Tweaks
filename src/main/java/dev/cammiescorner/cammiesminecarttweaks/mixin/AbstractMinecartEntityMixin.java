@@ -3,6 +3,7 @@ package dev.cammiescorner.cammiesminecarttweaks.mixin;
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import dev.cammiescorner.cammiesminecarttweaks.packets.SyncChainedMinecartPacket;
 import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -58,12 +59,13 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$tick(CallbackInfo info) {
 		if(!world.isClient()) {
+			MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world);
 			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
 
 			if(getLinkedParent() != null) {
 				double distance = getLinkedParent().distanceTo(this) - 1;
 
-				if(distance <= 3) {
+				if(distance <= 4) {
 					Vec3d direction = getLinkedParent().getPos().subtract(getPos()).normalize();
 
 					if(distance > 1) {
@@ -169,8 +171,8 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 				if(world instanceof ServerWorld server) {
 					NbtCompound nbt = stack.getOrCreateNbt();
 
-					if(nbt.contains("ParentEntity")) {
-						if(!getUuid().equals(nbt.getUuid("ParentEntity")) && server.getEntity(nbt.getUuid("ParentEntity")) instanceof AbstractMinecartEntity parent) {
+					if(nbt.contains("ParentEntity") && !getUuid().equals(nbt.getUuid("ParentEntity"))) {
+						if(server.getEntity(nbt.getUuid("ParentEntity")) instanceof AbstractMinecartEntity parent) {
 							Linkable linkable = (Linkable) parent;
 							Set<Linkable> train = new HashSet<>();
 							train.add(linkable);

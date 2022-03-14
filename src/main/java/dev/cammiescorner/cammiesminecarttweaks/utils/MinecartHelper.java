@@ -1,8 +1,9 @@
 package dev.cammiescorner.cammiesminecarttweaks.utils;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.block.AbstractRailBlock;
+import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.RailBlock;
 import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.tag.BlockTags;
@@ -17,56 +18,71 @@ import java.util.List;
 
 public class MinecartHelper {
 	public static boolean shouldSlowDown(AbstractMinecartEntity minecart, World world) {
-		int velocity = MathHelper.ceil(minecart.getVelocity().horizontalLength());
 		boolean slowEm = false;
-		Direction direction = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
-		BlockPos minecartPos = minecart.getBlockPos();
-		Vec3i pain = new Vec3i(minecartPos.getX(), 0, minecartPos.getZ());
-		BlockPos.Mutable pos = new BlockPos.Mutable();
-		List<Vec3i> poses = new ArrayList<>();
 
-		poses.add(minecartPos);
+		if(minecart != null) {
+			int velocity = MathHelper.ceil(minecart.getVelocity().horizontalLength());
+			Direction direction = Direction.getFacing(minecart.getVelocity().getX(), 0, minecart.getVelocity().getZ());
+			BlockPos minecartPos = minecart.getBlockPos();
+			Vec3i pain = new Vec3i(minecartPos.getX(), 0, minecartPos.getZ());
+			BlockPos.Mutable pos = new BlockPos.Mutable();
+			List<Vec3i> poses = new ArrayList<>();
 
-		for(int i = 0; i < poses.size(); i++) {
-			pos.set(poses.get(i));
-			int distance = pain.getManhattanDistance(new Vec3i(pos.getX(), 0, pos.getZ()));
+			poses.add(minecartPos);
 
-			if(distance > velocity)
-				break;
+			for(int i = 0; i < poses.size(); i++) {
+				pos.set(poses.get(i));
+				int distance = pain.getManhattanDistance(new Vec3i(pos.getX(), 0, pos.getZ()));
 
-			if(world.getBlockState(pos.down()).isIn(BlockTags.RAILS))
-				pos.move(0, -1, 0);
-
-			BlockState state = world.getBlockState(pos);
-
-			if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
-				RailShape shape = state.get(rails.getShapeProperty());
-
-				if(shape != RailShape.NORTH_SOUTH && shape != RailShape.EAST_WEST) {
-					slowEm = true;
+				if(distance > velocity)
 					break;
-				}
 
-				Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(shape);
-				Vec3i first = pair.getFirst().add(pos);
-				Vec3i second = pair.getSecond().add(pos);
+				if(world.getBlockState(pos.down()).isIn(BlockTags.RAILS))
+					pos.move(0, -1, 0);
 
-				if(distance < 2) {
-					if(!poses.contains(first))
-						poses.add(first);
-					if(!poses.contains(second))
-						poses.add(second);
+				BlockState state = world.getBlockState(pos);
 
-					continue;
-				}
+				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof RailBlock rails) {
+					RailShape shape = state.get(rails.getShapeProperty());
 
-				if((shape == RailShape.NORTH_SOUTH && direction == Direction.NORTH) || (shape == RailShape.EAST_WEST && direction == Direction.WEST)) {
-					if(!poses.contains(first))
-						poses.add(first);
-				}
-				else {
-					if(!poses.contains(second))
-						poses.add(second);
+					if(MinecartTweaks.getConfig().serverTweaks.minecartsCanSwitchRails && minecart.getVelocity().horizontalLength() > 0) {
+						if(shape == RailShape.NORTH_SOUTH && (direction == Direction.EAST || direction == Direction.WEST)) {
+							world.setBlockState(pos, state.with(RailBlock.SHAPE, RailShape.EAST_WEST));
+							break;
+						}
+
+						if(shape == RailShape.EAST_WEST && (direction == Direction.NORTH || direction == Direction.SOUTH)) {
+							world.setBlockState(pos, state.with(RailBlock.SHAPE, RailShape.NORTH_SOUTH));
+							break;
+						}
+					}
+
+					if((shape != RailShape.NORTH_SOUTH && shape != RailShape.EAST_WEST)) {
+						slowEm = true;
+						break;
+					}
+
+					Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(shape);
+					Vec3i first = pair.getFirst().add(pos);
+					Vec3i second = pair.getSecond().add(pos);
+
+					if(distance < 2) {
+						if(!poses.contains(first))
+							poses.add(first);
+						if(!poses.contains(second))
+							poses.add(second);
+
+						continue;
+					}
+
+					if((shape == RailShape.NORTH_SOUTH && direction == Direction.NORTH) || (shape == RailShape.EAST_WEST && direction == Direction.WEST)) {
+						if(!poses.contains(first))
+							poses.add(first);
+					}
+					else {
+						if(!poses.contains(second))
+							poses.add(second);
+					}
 				}
 			}
 		}

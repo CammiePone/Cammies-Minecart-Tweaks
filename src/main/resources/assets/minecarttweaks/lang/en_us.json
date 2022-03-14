@@ -18,5 +18,7 @@
 	"text.autoconfig.minecarttweaks.option.serverTweaks.canLinkMinecarts": "Can Minecarts be Linked by Chains?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?",
-	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartsLoadChunks": "Should Furnace Minecarts be able to load chunks?"
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartsLoadChunks": "Should Furnace Minecarts be able to load chunks?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.minecartsCanSwitchRails": "Can Minecarts cause perpendicular rails to switch direction?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.toolsHarvestBlockMinecarts": "Can tools harvest Minecarts with blocks in them?"
 }

@@ -77,7 +77,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 			if(fuel > 0)
 				server.getChunkManager().addTicket(ChunkTicketType.PLAYER, currentChunkPos, 3, getChunkPos());
-			if(!currentChunkPos.equals(prevChunkPos) || fuel < 0)
+			if(!currentChunkPos.equals(prevChunkPos) || fuel <= 0)
 				server.getChunkManager().removeTicket(ChunkTicketType.PLAYER, prevChunkPos, 3, getChunkPos());
 
 			prevChunkPos = currentChunkPos;
@@ -128,7 +128,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 			ItemStack stack = player.getStackInHand(hand);
 			Map<Item, Integer> fuels = AbstractFurnaceBlockEntity.createFuelTimeMap();
 
-			if(fuels.containsKey(stack.getItem())) {
+			if(!stack.isEmpty() && fuels.containsKey(stack.getItem())) {
 				int fuelTime = fuels.getOrDefault(stack.getItem(), 0);
 
 				if(!player.isCreative() && fuelTime > 0) {
@@ -146,7 +146,13 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 				fuel = (int) Math.min(MinecartTweaks.getConfig().serverTweaks.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
 			}
 
+			if(fuel > 0) {
+				pushX = getX() - player.getX();
+				pushZ = getZ() - player.getZ();
+			}
+
 			ACCEPTABLE_FUEL = Ingredient.empty();
+			info.setReturnValue(ActionResult.success(world.isClient));
 		}
 		else {
 			ACCEPTABLE_FUEL = OLD_ACCEPTABLE_FUEL;

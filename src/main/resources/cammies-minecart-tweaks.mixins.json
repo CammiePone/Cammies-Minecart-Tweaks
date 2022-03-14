@@ -6,6 +6,7 @@
 	"mixins": [
 		"AbstractMinecartEntityMixin",
 		"AllMinecartEntityMixin",
+		"BlockMinecartEntityMixin",
 		"FurnaceMinecartEntityMixin",
 		"StorageMinecartEntityMixin"
 	],
