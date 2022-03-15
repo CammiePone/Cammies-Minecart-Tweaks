@@ -1,7 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
-import dev.cammiescorner.cammiesminecarttweaks.packets.SyncChainedMinecartPacket;
+import dev.cammiescorner.cammiesminecarttweaks.common.packets.SyncChainedMinecartPacket;
 import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -59,7 +59,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$tick(CallbackInfo info) {
 		if(!world.isClient()) {
-			MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world);
 			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
 
 			if(getLinkedParent() != null) {
@@ -93,6 +92,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 				if(getLinkedParent().isRemoved())
 					setLinkedParent(null);
+			}
+			else {
+				MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world);
 			}
 
 			if(getLinkedChild() != null && getLinkedChild().isRemoved())

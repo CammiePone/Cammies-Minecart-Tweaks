@@ -63,13 +63,10 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 		float length = MathHelper.sqrt(squaredLength) - 1F;
 
 		stack.push();
-		stack.translate(0, 0.2, 0);
+		stack.translate(-0.5, 0, 0);
 		stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-hAngle - 90));
 		stack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(-vAngle));
-		stack.translate(0, 0, 0.5);
-		stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(45));
 		stack.push();
-		stack.translate(0.015, -0.2, 0);
 
 		VertexConsumer vertexConsumer = provider.getBuffer(CHAIN_LAYER);
 		float vertX1 = 0F;
@@ -90,8 +87,8 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 		vertexConsumer.vertex(matrix4f, vertX2, vertY2, 0F).color(0, 0, 0, 255).texture(maxU, minV).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(matrix3f, 0.0F, -1.0F, 0.0F).next();
 
 		stack.pop();
+		stack.translate(0.19, 0.19, 0);
 		stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(90));
-		stack.translate(-0.015, -0.2, 0);
 
 		entry = stack.peek();
 		matrix4f = entry.getPositionMatrix();

@@ -1,9 +1,9 @@
 package dev.cammiescorner.cammiesminecarttweaks.utils;
 
 import com.mojang.datafixers.util.Pair;
-import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
+import dev.cammiescorner.cammiesminecarttweaks.common.blocks.CrossedRailBlock;
+import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.RailBlock;
 import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.tag.BlockTags;
@@ -42,17 +42,17 @@ public class MinecartHelper {
 
 				BlockState state = world.getBlockState(pos);
 
-				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof RailBlock rails) {
+				if(state.isIn(BlockTags.RAILS) && state.getBlock() instanceof AbstractRailBlock rails) {
 					RailShape shape = state.get(rails.getShapeProperty());
 
-					if(MinecartTweaks.getConfig().serverTweaks.minecartsCanSwitchRails && minecart.getVelocity().horizontalLength() > 0) {
+					if(rails instanceof CrossedRailBlock && minecart.getVelocity().horizontalLength() > 0) {
 						if(shape == RailShape.NORTH_SOUTH && (direction == Direction.EAST || direction == Direction.WEST)) {
-							world.setBlockState(pos, state.with(RailBlock.SHAPE, RailShape.EAST_WEST));
+							world.setBlockState(pos, state.with(rails.getShapeProperty(), RailShape.EAST_WEST));
 							break;
 						}
 
 						if(shape == RailShape.EAST_WEST && (direction == Direction.NORTH || direction == Direction.SOUTH)) {
-							world.setBlockState(pos, state.with(RailBlock.SHAPE, RailShape.NORTH_SOUTH));
+							world.setBlockState(pos, state.with(rails.getShapeProperty(), RailShape.NORTH_SOUTH));
 							break;
 						}
 					}

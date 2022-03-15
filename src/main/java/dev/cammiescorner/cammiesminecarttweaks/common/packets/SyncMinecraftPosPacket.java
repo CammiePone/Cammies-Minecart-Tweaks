@@ -1,4 +1,4 @@
-package dev.cammiescorner.cammiesminecarttweaks.packets;
+package dev.cammiescorner.cammiesminecarttweaks.common.packets;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import net.fabricmc.api.EnvType;

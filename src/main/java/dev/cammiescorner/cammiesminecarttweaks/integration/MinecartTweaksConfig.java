@@ -40,7 +40,6 @@ public class MinecartTweaksConfig implements ConfigData {
 		public boolean shouldPoweredRailsStopFurnace = true;
 		public boolean furnacesCanUseAllFuels = true;
 		public boolean furnaceMinecartsLoadChunks = false;
-		public boolean minecartsCanSwitchRails = true;
 		public boolean toolsHarvestBlockMinecarts = true;
 	}
 }

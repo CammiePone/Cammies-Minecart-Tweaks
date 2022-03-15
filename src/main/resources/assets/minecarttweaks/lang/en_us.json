@@ -1,6 +1,7 @@
 {
 	"minecarttweaks.cant_link_to_engine": "You can't make the caboose the engine of the engine!",
 	"death.attack.minecarttweaks.minecart": "%s didn't look both ways before crossing the rail line",
+	"block.minecarttweaks.crossed_rail": "Crossed Rail",
 
 	"text.autoconfig.minecarttweaks.title": "Cammie's Minecart Tweaks",
 	"text.autoconfig.minecarttweaks.option.clientTweaks": "Client Tweaks (Changes Only Needed on Client)",
@@ -19,6 +20,5 @@
 	"text.autoconfig.minecarttweaks.option.serverTweaks.shouldPoweredRailsStopFurnace": "Should Powered Rails Stop Furnace Minecarts?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.furnacesCanUseAllFuels": "Should Furnace Minecarts be able to use all fuels?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartsLoadChunks": "Should Furnace Minecarts be able to load chunks?",
-	"text.autoconfig.minecarttweaks.option.serverTweaks.minecartsCanSwitchRails": "Can Minecarts cause perpendicular rails to switch direction?",
 	"text.autoconfig.minecarttweaks.option.serverTweaks.toolsHarvestBlockMinecarts": "Can tools harvest Minecarts with blocks in them?"
 }

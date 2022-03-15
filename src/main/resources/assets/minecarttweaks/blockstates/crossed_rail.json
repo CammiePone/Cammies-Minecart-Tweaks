@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"shape=east_west": {
+			"model": "minecarttweaks:block/crossed_rail"
+		},
+		"shape=north_south": {
+			"model": "minecarttweaks:block/crossed_rail"
+		}
+	}
+}
