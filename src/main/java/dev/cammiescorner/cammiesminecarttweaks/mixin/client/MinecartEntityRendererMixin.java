@@ -63,9 +63,9 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 		float length = MathHelper.sqrt(squaredLength) - 1F;
 
 		stack.push();
-		stack.translate(-0.5, 0, 0);
 		stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-hAngle - 90));
 		stack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(-vAngle));
+		stack.translate(0, 0, 0.5);
 		stack.push();
 
 		VertexConsumer vertexConsumer = provider.getBuffer(CHAIN_LAYER);

@@ -1,11 +1,13 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
+import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolItem;
 import net.minecraft.world.GameRules;
@@ -16,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = {ChestMinecartEntity.class, FurnaceMinecartEntity.class, HopperMinecartEntity.class, TntMinecartEntity.class}, priority = 0)
-public abstract class BlockMinecartEntityMixin extends AbstractMinecartEntity {
+public abstract class BlockMinecartEntityMixin extends AbstractMinecartEntity implements Linkable {
 	protected BlockMinecartEntityMixin(EntityType<?> entityType, World world) { super(entityType, world); }
 
 	@Inject(method = "dropItems", at = @At("HEAD"), cancellable = true)
@@ -33,6 +35,9 @@ public abstract class BlockMinecartEntityMixin extends AbstractMinecartEntity {
 					dropItem(Items.HOPPER_MINECART);
 				if((Object) this instanceof TntMinecartEntity)
 					dropItem(Items.TNT_MINECART);
+
+				if(getLinkedParent() != null || getLinkedChild() != null)
+					dropStack(new ItemStack(Items.CHAIN));
 			}
 
 			info.cancel();

@@ -8,6 +8,7 @@
 		"AllMinecartEntityMixin",
 		"BlockMinecartEntityMixin",
 		"FurnaceMinecartEntityMixin",
+		"MinecartItemMixin",
 		"StorageMinecartEntityMixin"
 	],
 	"client": [
