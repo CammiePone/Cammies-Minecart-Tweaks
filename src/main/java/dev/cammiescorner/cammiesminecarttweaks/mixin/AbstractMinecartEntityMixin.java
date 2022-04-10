@@ -169,7 +169,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(MinecartTweaks.getConfig().serverTweaks.canLinkMinecarts) {
 			ItemStack stack = player.getStackInHand(hand);
 
-			if(player.isSneaking() && stack.isOf(Items.CHAIN) && getLinkedChild() == null) {
+			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {
 				if(world instanceof ServerWorld server) {
 					NbtCompound nbt = stack.getOrCreateNbt();
 
@@ -183,12 +183,13 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 								train.add(linkable);
 							}
 
-							if(train.contains(this)) {
+							if(train.contains(this) || ((Linkable) parent).getLinkedChild() != null) {
 								player.sendMessage(new TranslatableText(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
 							}
 							else {
 								if(getLinkedParent() != null)
 									((Linkable) getLinkedParent()).setLinkedChild(null);
+
 
 								setLinkedParent(parent);
 								((Linkable) parent).setLinkedChild((AbstractMinecartEntity) (Object) this);
