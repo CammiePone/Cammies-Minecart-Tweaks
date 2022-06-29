@@ -17,7 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -48,10 +48,10 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 	public AbstractMinecartEntityMixin(EntityType<?> type, World world) { super(type, world); }
 
-	@Inject(method = "getMaxOffRailSpeed", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "getMaxSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
 		if(getLinkedParent() != null)
-			info.setReturnValue(getLinkedParent().getMaxOffRailSpeed());
+			info.setReturnValue(getLinkedParent().getMaxSpeed());
 		else
 			info.setReturnValue(MinecartTweaks.getConfig().getOtherMinecartSpeed());
 	}
@@ -127,7 +127,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 			dropStack(new ItemStack(Items.CHAIN));
 	}
 
-	@Inject(method = "collidesWith", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "collidesWith", at = @At("HEAD"))
 	public void minecarttweaks$damageEntities(Entity other, CallbackInfoReturnable<Boolean> info) {
 		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
 			minecart.setVelocity(getVelocity());
@@ -184,7 +184,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 							}
 
 							if(train.contains(this) || ((Linkable) parent).getLinkedChild() != null) {
-								player.sendMessage(new TranslatableText(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
+								player.sendMessage(Text.translatable(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
 							}
 							else {
 								if(getLinkedParent() != null)

@@ -62,12 +62,12 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		prevChunkPos = getChunkPos();
 	}
 
-	@Inject(method = "getMaxOffRailSpeed", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "getMaxSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
 		if(isLit())
 			info.setReturnValue(MinecartTweaks.getConfig().getFurnaceMinecartSpeed());
 		else
-			info.setReturnValue(super.getMaxOffRailSpeed());
+			info.setReturnValue(super.getMaxSpeed());
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
@@ -178,7 +178,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	}
 
 	@ModifyArg(method = "tick", at = @At(value = "INVOKE",
-			target = "Ljava/util/Random;nextInt(I)I"
+			target = "Lnet/minecraft/util/math/random/Random;nextInt(I)I"
 	))
 	public int minecarttweaks$removeRandom(int i) {
 		return 1;
