@@ -2,6 +2,7 @@ package dev.cammiescorner.cammiesminecarttweaks.client;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import dev.cammiescorner.cammiesminecarttweaks.common.packets.SyncChainedMinecartPacket;
+import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,7 +24,7 @@ public class MinecartTweaksClient implements ClientModInitializer {
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			ItemStack stack = player.getStackInHand(hand);
 
-			if(world.isClient() && entity instanceof FurnaceMinecartEntity && MinecartTweaks.getConfig().clientTweaks.dontEatEnchantedItems && stack.hasEnchantments())
+			if(world.isClient() && entity instanceof FurnaceMinecartEntity && MinecartTweaksConfig.dontEatEnchantedItems && stack.hasEnchantments())
 				return ActionResult.CONSUME;
 
 			return ActionResult.PASS;

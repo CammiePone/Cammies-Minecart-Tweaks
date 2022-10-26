@@ -2,6 +2,7 @@ package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import dev.cammiescorner.cammiesminecarttweaks.common.packets.SyncChainedMinecartPacket;
+import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
 import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -53,7 +54,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(getLinkedParent() != null)
 			info.setReturnValue(getLinkedParent().getMaxSpeed());
 		else
-			info.setReturnValue(MinecartTweaks.getConfig().getOtherMinecartSpeed());
+			info.setReturnValue(MinecartTweaksConfig.getOtherMinecartSpeed());
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
@@ -101,14 +102,14 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 				setLinkedChild(null);
 		}
 		else {
-			if(MinecartTweaks.getConfig().clientTweaks.playerViewIsLocked) {
+			if(MinecartTweaksConfig.playerViewIsLocked) {
 				Vec3d directionVec = getVelocity().normalize();
 
-				if(getVelocity().length() > MinecartTweaks.getConfig().getOtherMinecartSpeed() * 0.5) {
+				if(getVelocity().length() > MinecartTweaksConfig.getOtherMinecartSpeed() * 0.5) {
 					float yaw = (float) MathHelper.wrapDegrees(Math.toDegrees(Math.atan2(directionVec.getZ(), directionVec.getX())) - 90);
 
 					for(Entity passenger : getPassengerList()) {
-						float wantedYaw = MathHelper.wrapDegrees(MathHelper.clampAngle(passenger.getYaw(), yaw, MinecartTweaks.getConfig().clientTweaks.maxViewAngle) - passenger.getYaw());
+						float wantedYaw = MathHelper.wrapDegrees(MathHelper.clampAngle(passenger.getYaw(), yaw, MinecartTweaksConfig.maxViewAngle) - passenger.getYaw());
 						float steps = Math.abs(wantedYaw) / 5F;
 
 						if(wantedYaw >= steps)
@@ -132,14 +133,13 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
 			minecart.setVelocity(getVelocity());
 
-		float damage = MinecartTweaks.getConfig().serverTweaks.minecartDamage;
+		float damage = MinecartTweaksConfig.minecartDamage;
 
 		if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
-			living.damage(MinecartTweaks.minecart(this), damage);
-
 			Vec3d knockback = living.getVelocity().add(getVelocity().getX() * 0.9, getVelocity().length() * 0.2, getVelocity().getZ() * 0.9);
 			living.setVelocity(knockback);
 			living.velocityDirty = true;
+			living.damage(MinecartTweaks.minecart(this), damage);
 		}
 	}
 
@@ -166,7 +166,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 	@Override
 	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(MinecartTweaks.getConfig().serverTweaks.canLinkMinecarts) {
+		if(MinecartTweaksConfig.canLinkMinecarts) {
 			ItemStack stack = player.getStackInHand(hand);
 
 			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {

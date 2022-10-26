@@ -1,6 +1,6 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
-import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
+import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
 import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.minecraft.block.BlockState;
@@ -65,14 +65,14 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 	@Inject(method = "getMaxSpeed", at = @At("RETURN"), cancellable = true)
 	public void minecarttweaks$increaseSpeed(CallbackInfoReturnable<Double> info) {
 		if(isLit())
-			info.setReturnValue(MinecartTweaks.getConfig().getFurnaceMinecartSpeed());
+			info.setReturnValue(MinecartTweaksConfig.getFurnaceMinecartSpeed());
 		else
 			info.setReturnValue(super.getMaxSpeed());
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$loadChunks(CallbackInfo info) {
-		if(MinecartTweaks.getConfig().serverTweaks.furnaceMinecartsLoadChunks && world instanceof ServerWorld server) {
+		if(MinecartTweaksConfig.furnaceMinecartsLoadChunks && world instanceof ServerWorld server) {
 			ChunkPos currentChunkPos = ChunkSectionPos.from(this).toChunkPos();
 
 			if(fuel > 0)
@@ -86,7 +86,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@Inject(method = "moveOnRail", at = @At("TAIL"))
 	public void minecarttweaks$slowDown(BlockPos pos, BlockState state, CallbackInfo info) {
-		if(MinecartTweaks.getConfig().serverTweaks.shouldPoweredRailsStopFurnace) {
+		if(MinecartTweaksConfig.shouldPoweredRailsStopFurnace) {
 			if(altFuel <= 0 && fuel > 0) {
 				if(state.isOf(Blocks.POWERED_RAIL) && !state.get(PoweredRailBlock.POWERED)) {
 					altPushX = pushX;
@@ -118,13 +118,13 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		}
 
 
-		if(shouldSlowDown.get() && getVelocity().length() > MinecartTweaks.getConfig().getMaxSpeedAroundTurns())
-			setVelocity(getVelocity().normalize().multiply(MinecartTweaks.getConfig().	getMaxSpeedAroundTurns()));
+		if(shouldSlowDown.get() && getVelocity().length() > MinecartTweaksConfig.getMaxSpeedAroundTurns())
+			setVelocity(getVelocity().normalize().multiply(MinecartTweaksConfig.getMaxSpeedAroundTurns()));
 	}
 
 	@Inject(method = "interact", at = @At("HEAD"), cancellable = true)
 	public void minecarttweaks$addOtherFuels(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
-		if(MinecartTweaks.getConfig().serverTweaks.furnacesCanUseAllFuels) {
+		if(MinecartTweaksConfig.furnacesCanUseAllFuels) {
 			ItemStack stack = player.getStackInHand(hand);
 			Map<Item, Integer> fuels = AbstractFurnaceBlockEntity.createFuelTimeMap();
 
@@ -143,7 +143,7 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 					world.playSound(player, player.getBlockPos(), soundEvent, SoundCategory.BLOCKS, 1.0f, 1.0f);
 				}
 
-				fuel = (int) Math.min(MinecartTweaks.getConfig().serverTweaks.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
+				fuel = (int) Math.min(MinecartTweaksConfig.furnaceMaxBurnTime, fuel + (fuelTime * 2.25));
 			}
 
 			if(fuel > 0) {
@@ -161,14 +161,14 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 
 	@ModifyConstant(method = "interact", constant = @Constant(intValue = 32000))
 	public int minecarttweaks$maxBurnTime(int maxBurnTime) {
-		return MinecartTweaks.getConfig().serverTweaks.furnaceMaxBurnTime;
+		return MinecartTweaksConfig.furnaceMaxBurnTime;
 	}
 
 	@ModifyArgs(method = "tick", at = @At(value = "INVOKE",
 			target = "Lnet/minecraft/world/World;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"
 	))
 	public void minecarttweaks$changeSmokeParticle(Args args) {
-		if(MinecartTweaks.getConfig().clientTweaks.useCampfireSmoke)
+		if(MinecartTweaksConfig.useCampfireSmoke)
 			args.set(0, ParticleTypes.CAMPFIRE_COSY_SMOKE);
 
 		args.set(1, getX() + (random.nextFloat() - 0.5));
