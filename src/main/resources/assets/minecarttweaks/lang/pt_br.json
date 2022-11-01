@@ -1,0 +1,24 @@
+{
+	"minecarttweaks.cant_link_to_engine": "Você não pode fazer do vagão o motor do motor!",
+	"death.attack.minecarttweaks.minecart": "%s não olhou para os dois lados antes de cruzar a linha férrea",
+	"block.minecarttweaks.crossed_rail": "Trilho cruzado",
+
+	"text.autoconfig.minecarttweaks.title": "Ajustes do Minecart da Cammie",
+	"text.autoconfig.minecarttweaks.option.clientTweaks": "Ajustes do cliente (mudanças necessárias apenas no cliente)",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.useCampfireSmoke": "Os carrinhos de mina de forno devem produzir partículas de fumaça de fogueira?",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.dontEatEnchantedItems": "Impedir que Carrinhos de Fornalha queimem itens encantados?",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.playerViewIsLocked": "A visão do jogador deve ser bloqueada ao andar de Minecart?",
+	"text.autoconfig.minecarttweaks.option.clientTweaks.maxViewAngle": "Ângulo de visão máximo se a visão do jogador estiver bloqueada",
+
+	"text.autoconfig.minecarttweaks.option.serverTweaks": "Ajustes do Servidor (Mudanças Necessárias Apenas no Servidor)",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartSpeed": "Velocidade do Carrinho da Fornalha (m/s)",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.otherMinecartSpeed": "Outras Velocidades do Minecart (m/s)",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.maxSpeedAroundTurns": "Velocidade máxima em voltas",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.minecartDamage": "Danos Causados por Carrinhos de Mina",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMaxBurnTime": "Tempo máximo que um Minecart Furnace pode funcionar (em ticks)",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.canLinkMinecarts": "Os minecarts podem ser vinculados por correntes?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.shouldPoweredRailsStopFurnace": "Os trilhos elétricos devem parar os carrinhos de mina do forno?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnacesCanUseAllFuels": "Os Carrinhos de Mineração do Forno devem ser capazes de usar todos os combustíveis?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.furnaceMinecartsLoadChunks": "Os Carrinhos de Mineração do Forno devem ser capazes de carregar pedaços?",
+	"text.autoconfig.minecarttweaks.option.serverTweaks.toolsHarvestBlockMinecarts": "As ferramentas podem coletar Minecarts com blocos neles?"
+}
