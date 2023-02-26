@@ -268,9 +268,4 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	public void setLinkedChildClient(int id) {
 		this.childIdClient = id;
 	}
-
-	@Override
-	public AbstractMinecartEntity asAbstractMinecartEntity() {
-		return (AbstractMinecartEntity) (Object) this;
-	}
 }

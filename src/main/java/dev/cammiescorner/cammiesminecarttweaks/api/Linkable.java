@@ -8,16 +8,20 @@ import org.jetbrains.annotations.Nullable;
  * Interface injected onto AbstractMinecartEntity to facilitate linking carts together.
  */
 public interface Linkable {
-	@Nullable AbstractMinecartEntity getLinkedParent();
-	void setLinkedParent(@Nullable AbstractMinecartEntity parent);
+	default @Nullable AbstractMinecartEntity getLinkedParent() {
+		return null;
+	}
+	default void setLinkedParent(@Nullable AbstractMinecartEntity parent) {}
 
-	@Nullable AbstractMinecartEntity getLinkedChild();
-	void setLinkedChild(@Nullable AbstractMinecartEntity child);
+	default @Nullable AbstractMinecartEntity getLinkedChild() {
+		return null;
+	}
+	default void setLinkedChild(@Nullable AbstractMinecartEntity child) {}
 
-	void setLinkedParentClient(int id);
-	void setLinkedChildClient(int id);
+	default void setLinkedParentClient(int id) {}
+	default void setLinkedChildClient(int id) {}
 
-	AbstractMinecartEntity asAbstractMinecartEntity();
+	default AbstractMinecartEntity asAbstractMinecartEntity() { return (AbstractMinecartEntity) this; }
 
 	static void setParentChild(@NotNull Linkable parent, @NotNull Linkable child) {
 		unsetParentChild(parent, parent.getLinkedChild());
