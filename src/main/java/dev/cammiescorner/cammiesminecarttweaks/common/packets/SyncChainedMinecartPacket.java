@@ -1,7 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.common.packets;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -11,14 +11,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SyncChainedMinecartPacket {
 	public static final Identifier ID = MinecartTweaks.id("sync_chained_minecart");

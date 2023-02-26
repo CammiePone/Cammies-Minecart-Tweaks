@@ -3,7 +3,7 @@ package dev.cammiescorner.cammiesminecarttweaks.mixin;
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import dev.cammiescorner.cammiesminecarttweaks.common.packets.SyncChainedMinecartPacket;
 import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
@@ -22,13 +22,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -84,20 +82,20 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 						setVelocity(Vec3d.ZERO);
 				}
 				else {
-					Linkable.unsetParentChild((Linkable)this.getLinkedParent(), this);
+					Linkable.unsetParentChild(this.getLinkedParent(), this);
 					dropStack(new ItemStack(Items.CHAIN));
 					return;
 				}
 
 				if(getLinkedParent().isRemoved())
-					Linkable.unsetParentChild((Linkable) getLinkedParent(), this);
+					Linkable.unsetParentChild(getLinkedParent(), this);
 			}
 			else {
 				MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world);
 			}
 
 			if(getLinkedChild() != null && getLinkedChild().isRemoved())
-				Linkable.unsetParentChild(this, (Linkable) getLinkedChild());
+				Linkable.unsetParentChild(this, getLinkedChild());
 
 			this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()), this::collidesWith).forEach(other -> {
 				if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart)) {
@@ -174,24 +172,23 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 					if(nbt.contains("ParentEntity") && !getUuid().equals(nbt.getUuid("ParentEntity"))) {
 						if(server.getEntity(nbt.getUuid("ParentEntity")) instanceof AbstractMinecartEntity parent) {
-							Linkable linkable = (Linkable) parent;
 							Set<Linkable> train = new HashSet<>();
-							train.add(linkable);
+							train.add(parent);
 
-							while((linkable = (Linkable) linkable.getLinkedParent()) instanceof Linkable && !train.contains(linkable)) {
-								train.add(linkable);
+							while((parent = parent.getLinkedParent()) instanceof Linkable && !train.contains(parent)) {
+								train.add(parent);
 							}
 
-							if(train.contains(this) || ((Linkable) parent).getLinkedChild() != null) {
+							if(train.contains(this) || parent.getLinkedChild() != null) {
 								player.sendMessage(Text.translatable(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
 							}
 							else {
 								if(getLinkedParent() != null)
-									((Linkable) getLinkedParent()).setLinkedChild(null);
+									getLinkedParent().setLinkedChild(null);
 
 
 								setLinkedParent(parent);
-								((Linkable) parent).setLinkedChild((AbstractMinecartEntity) (Object) this);
+								parent.setLinkedChild((AbstractMinecartEntity) (Object) this);
 							}
 						}
 						else {

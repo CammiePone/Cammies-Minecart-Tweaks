@@ -1,9 +1,12 @@
-package dev.cammiescorner.cammiesminecarttweaks.utils;
+package dev.cammiescorner.cammiesminecarttweaks.api;
 
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Interface injected onto AbstractMinecartEntity to facilitate linking carts together.
+ */
 public interface Linkable {
 	@Nullable AbstractMinecartEntity getLinkedParent();
 	void setLinkedParent(@Nullable AbstractMinecartEntity parent);
@@ -17,8 +20,8 @@ public interface Linkable {
 	AbstractMinecartEntity asAbstractMinecartEntity();
 
 	static void setParentChild(@NotNull Linkable parent, @NotNull Linkable child) {
-		unsetParentChild(parent, (Linkable) parent.getLinkedChild());
-		unsetParentChild(child, (Linkable) child.getLinkedParent());
+		unsetParentChild(parent, parent.getLinkedChild());
+		unsetParentChild(child, child.getLinkedParent());
 		parent.setLinkedChild(child.asAbstractMinecartEntity());
 		child.setLinkedParent(parent.asAbstractMinecartEntity());
 	}

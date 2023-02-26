@@ -1,6 +1,6 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.*;
@@ -42,12 +42,12 @@ public abstract class AllMinecartEntityMixin extends AbstractMinecartEntity impl
 				world.spawnEntity(minecart);
 
 				if(parent != null) {
-					Linkable.unsetParentChild((Linkable) parent, this);
-					Linkable.setParentChild((Linkable) parent, (Linkable) minecart);
+					Linkable.unsetParentChild(parent, this);
+					Linkable.setParentChild(parent, minecart);
 				}
 				if(child != null) {
-					Linkable.unsetParentChild(this, (Linkable) child);
-					Linkable.setParentChild((Linkable) minecart, (Linkable) child);
+					Linkable.unsetParentChild(this, child);
+					Linkable.setParentChild(minecart, child);
 				}
 
 				remove(RemovalReason.DISCARDED);
