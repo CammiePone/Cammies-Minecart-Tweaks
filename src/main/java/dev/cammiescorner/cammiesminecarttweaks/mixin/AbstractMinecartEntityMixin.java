@@ -42,7 +42,6 @@ import java.util.UUID;
 
 @Mixin(AbstractMinecartEntity.class)
 public abstract class AbstractMinecartEntityMixin extends Entity implements Linkable {
-	@Shadow public abstract Direction getMovementDirection();
 	@Unique private @Nullable UUID parentUuid;
 	@Unique private @Nullable UUID childUuid;
 
@@ -99,6 +98,22 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 			if(getLinkedChild() != null && getLinkedChild().isRemoved())
 				Linkable.unsetParentChild(this, (Linkable) getLinkedChild());
+
+			this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()), this::collidesWith).forEach(other -> {
+				if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart)) {
+					minecart.setVelocity(getVelocity());
+				}
+
+				float damage = MinecartTweaksConfig.minecartDamage;
+
+				if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
+					Vec3d knockback = living.getVelocity().add(getVelocity().getX() * 0.9, getVelocity().length() * 0.2, getVelocity().getZ() * 0.9);
+					living.setVelocity(knockback);
+					living.velocityDirty = true;
+					living.damage(MinecartTweaks.minecart(this), damage);
+				}
+
+			});
 		}
 		else {
 			if(MinecartTweaksConfig.playerViewIsLocked) {
@@ -125,21 +140,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	public void minecarttweaks$dropChain(DamageSource damageSource, CallbackInfo info) {
 		if(getLinkedParent() != null || getLinkedChild() != null)
 			dropStack(new ItemStack(Items.CHAIN));
-	}
-
-	@Inject(method = "collidesWith", at = @At("HEAD"))
-	public void minecarttweaks$damageEntities(Entity other, CallbackInfoReturnable<Boolean> info) {
-		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
-			minecart.setVelocity(getVelocity());
-
-		float damage = MinecartTweaksConfig.minecartDamage;
-
-		if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
-			Vec3d knockback = living.getVelocity().add(getVelocity().getX() * 0.9, getVelocity().length() * 0.2, getVelocity().getZ() * 0.9);
-			living.setVelocity(knockback);
-			living.velocityDirty = true;
-			living.damage(MinecartTweaks.minecart(this), damage);
-		}
 	}
 
 	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
@@ -222,6 +222,12 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 		}
 
 		return super.interact(player, hand);
+	}
+
+	@Override
+	public AbstractMinecartEntity getLinkedParent() {
+		var entity = this.world instanceof ServerWorld serverWorld && this.parentUuid != null ? serverWorld.getEntity(this.parentUuid) : this.world.getEntityById(this.parentIdClient);
+		return entity instanceof AbstractMinecartEntity abstractMinecartEntity ? abstractMinecartEntity : null;
 	}
 
 	@Override
