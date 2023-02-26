@@ -42,14 +42,12 @@ public abstract class AllMinecartEntityMixin extends AbstractMinecartEntity impl
 				world.spawnEntity(minecart);
 
 				if(parent != null) {
-					setLinkedParent(null);
-					((Linkable) minecart).setLinkedParent(parent);
-					((Linkable) parent).setLinkedChild(minecart);
+					Linkable.unsetParentChild((Linkable) parent, this);
+					Linkable.setParentChild((Linkable) parent, (Linkable) minecart);
 				}
 				if(child != null) {
-					setLinkedChild(null);
-					((Linkable) minecart).setLinkedChild(child);
-					((Linkable) child).setLinkedParent(minecart);
+					Linkable.unsetParentChild(this, (Linkable) child);
+					Linkable.setParentChild((Linkable) minecart, (Linkable) child);
 				}
 
 				remove(RemovalReason.DISCARDED);

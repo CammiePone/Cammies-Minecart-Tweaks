@@ -31,9 +31,8 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 
 	@Inject(method = "render(Lnet/minecraft/entity/vehicle/AbstractMinecartEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
 	public void minecarttweaks$render(T child, float yaw, float tickDelta, MatrixStack stack, VertexConsumerProvider provider, int light, CallbackInfo info) {
-		if(child instanceof Linkable linkable) {
-			AbstractMinecartEntity parent = linkable.getLinkedParent();
-
+		if(child instanceof Linkable) {
+			AbstractMinecartEntity parent = ((Linkable)child).getLinkedParent();
 			if(parent != null) {
 				double startX = parent.getX();
 				double startY = parent.getY();

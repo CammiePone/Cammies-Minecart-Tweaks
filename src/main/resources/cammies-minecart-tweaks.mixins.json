@@ -1,20 +1,21 @@
 {
-	"required": true,
-	"minVersion": "0.8",
-	"package": "dev.cammiescorner.cammiesminecarttweaks.mixin",
-	"compatibilityLevel": "JAVA_16",
-	"mixins": [
-		"AbstractMinecartEntityMixin",
-		"AllMinecartEntityMixin",
-		"FurnaceMinecartEntityMixin",
-		"MinecartItemMixin",
-		"StorageMinecartEntityMixin"
-	],
-	"client": [
-		"client.MinecartEntityRendererMixin",
-		"client.SplashTextResourceSupplierMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.cammiescorner.cammiesminecarttweaks.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "AbstractMinecartEntityMixin",
+    "AllMinecartEntityMixin",
+    "EntityTrackerEntryMixin",
+    "FurnaceMinecartEntityMixin",
+    "MinecartItemMixin",
+    "StorageMinecartEntityMixin"
+  ],
+  "client": [
+    "client.MinecartEntityRendererMixin",
+    "client.SplashTextResourceSupplierMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }
