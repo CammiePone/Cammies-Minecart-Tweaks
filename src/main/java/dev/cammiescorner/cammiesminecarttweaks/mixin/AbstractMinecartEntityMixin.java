@@ -162,66 +162,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	}
 
 	@Override
-	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(MinecartTweaksConfig.canLinkMinecarts) {
-			ItemStack stack = player.getStackInHand(hand);
-
-			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {
-				if(world instanceof ServerWorld server) {
-					NbtCompound nbt = stack.getOrCreateNbt();
-
-					if(nbt.contains("ParentEntity") && !getUuid().equals(nbt.getUuid("ParentEntity"))) {
-						if(server.getEntity(nbt.getUuid("ParentEntity")) instanceof AbstractMinecartEntity parent) {
-							Set<Linkable> train = new HashSet<>();
-							train.add(parent);
-
-							while((parent = parent.getLinkedParent()) instanceof Linkable && !train.contains(parent)) {
-								train.add(parent);
-							}
-
-							if(train.contains(this) || parent.getLinkedChild() != null) {
-								player.sendMessage(Text.translatable(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
-							}
-							else {
-								if(getLinkedParent() != null)
-									getLinkedParent().setLinkedChild(null);
-
-
-								setLinkedParent(parent);
-								parent.setLinkedChild((AbstractMinecartEntity) (Object) this);
-							}
-						}
-						else {
-							nbt.remove("ParentEntity");
-
-							if(nbt.isEmpty())
-								stack.setNbt(null);
-						}
-
-						world.playSound(null, getX(), getY(), getZ(), SoundEvents.BLOCK_CHAIN_PLACE, SoundCategory.NEUTRAL, 1F, 1F);
-
-						if(!player.isCreative())
-							stack.decrement(1);
-
-						nbt.remove("ParentEntity");
-
-						if(nbt.isEmpty())
-							stack.setNbt(null);
-					}
-					else {
-						nbt.putUuid("ParentEntity", getUuid());
-						world.playSound(null, getX(), getY(), getZ(), SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.NEUTRAL, 1F, 1F);
-					}
-				}
-
-				return ActionResult.success(true);
-			}
-		}
-
-		return super.interact(player, hand);
-	}
-
-	@Override
 	public AbstractMinecartEntity getLinkedParent() {
 		var entity = this.world instanceof ServerWorld serverWorld && this.parentUuid != null ? serverWorld.getEntity(this.parentUuid) : this.world.getEntityById(this.parentIdClient);
 		return entity instanceof AbstractMinecartEntity abstractMinecartEntity ? abstractMinecartEntity : null;
