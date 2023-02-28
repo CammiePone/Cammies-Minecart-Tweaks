@@ -6,6 +6,7 @@ import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
@@ -14,6 +15,8 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -21,7 +24,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,8 +36,9 @@ public class MinecartTweaks implements ModInitializer {
 	public void onInitialize() {
 		MidnightConfig.init(MinecartTweaks.MOD_ID, MinecartTweaksConfig.class);
 
-		Registry.register(Registry.BLOCK, id("crossed_rail"), CROSSED_RAIL);
-		Registry.register(Registry.ITEM, id("crossed_rail"), new BlockItem(CROSSED_RAIL, new Item.Settings().group(ItemGroup.TRANSPORTATION)));
+		Registry.register(Registries.BLOCK, id("crossed_rail"), CROSSED_RAIL);
+		Registry.register(Registries.ITEM, id("crossed_rail"), new BlockItem(CROSSED_RAIL, new Item.Settings()));
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries -> entries.add(CROSSED_RAIL));
 
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if(entity instanceof MinecartEntity ridableCart && ridableCart.getMinecartType() == AbstractMinecartEntity.Type.RIDEABLE) {

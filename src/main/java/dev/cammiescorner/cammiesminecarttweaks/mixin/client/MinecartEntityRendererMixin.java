@@ -1,7 +1,6 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin.client;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
-import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -13,9 +12,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,8 +59,8 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 		float length = MathHelper.sqrt(squaredLength) - 1F;
 
 		stack.push();
-		stack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-hAngle - 90));
-		stack.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(-vAngle));
+		stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-hAngle - 90));
+		stack.multiply(RotationAxis.POSITIVE_X.rotation(-vAngle));
 		stack.translate(0, 0, 0.5);
 		stack.push();
 
@@ -85,7 +84,7 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 
 		stack.pop();
 		stack.translate(0.19, 0.19, 0);
-		stack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(90));
+		stack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90));
 
 		entry = stack.peek();
 		matrix4f = entry.getPositionMatrix();
