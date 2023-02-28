@@ -1,7 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin;
 
 import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -107,10 +107,10 @@ public abstract class FurnaceMinecartEntityMixin extends AbstractMinecartEntity 
 		train.add(this);
 
 		if(getLinkedChild() != null) {
-			Linkable linkable = (Linkable) getLinkedChild();
+			Linkable linkable = getLinkedChild();
 			train.add(getLinkedChild());
 
-			while((linkable = (Linkable) linkable.getLinkedChild()) instanceof Linkable && !train.contains(linkable)) {
+			while((linkable = linkable.getLinkedChild()) instanceof Linkable && !train.contains(linkable)) {
 				train.add(linkable.getLinkedChild());
 			}
 

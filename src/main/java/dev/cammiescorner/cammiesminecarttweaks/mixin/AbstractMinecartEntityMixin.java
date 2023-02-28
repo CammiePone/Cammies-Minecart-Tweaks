@@ -3,7 +3,7 @@ package dev.cammiescorner.cammiesminecarttweaks.mixin;
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
 import dev.cammiescorner.cammiesminecarttweaks.common.packets.SyncChainedMinecartPacket;
 import dev.cammiescorner.cammiesminecarttweaks.integration.MinecartTweaksConfig;
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import dev.cammiescorner.cammiesminecarttweaks.utils.MinecartHelper;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
@@ -22,12 +22,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,11 +40,11 @@ import java.util.UUID;
 
 @Mixin(AbstractMinecartEntity.class)
 public abstract class AbstractMinecartEntityMixin extends Entity implements Linkable {
-	@Shadow public abstract Direction getMovementDirection();
-	@Unique private AbstractMinecartEntity linkedParent;
-	@Unique private AbstractMinecartEntity linkedChild;
-	@Unique private UUID parentUuid;
-	@Unique private UUID childUuid;
+	@Unique private @Nullable UUID parentUuid;
+	@Unique private @Nullable UUID childUuid;
+
+	@Unique private int parentIdClient;
+	@Unique private int childIdClient;
 
 	public AbstractMinecartEntityMixin(EntityType<?> type, World world) { super(type, world); }
 
@@ -60,8 +59,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	@Inject(method = "tick", at = @At("HEAD"))
 	public void minecarttweaks$tick(CallbackInfo info) {
 		if(!world.isClient()) {
-			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(player, linkedParent, (AbstractMinecartEntity) (Object) this));
-
 			if(getLinkedParent() != null) {
 				double distance = getLinkedParent().distanceTo(this) - 1;
 
@@ -85,21 +82,36 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 						setVelocity(Vec3d.ZERO);
 				}
 				else {
-					((Linkable) getLinkedParent()).setLinkedChild(null);
-					setLinkedParent(null);
+					Linkable.unsetParentChild(this.getLinkedParent(), this);
 					dropStack(new ItemStack(Items.CHAIN));
 					return;
 				}
 
 				if(getLinkedParent().isRemoved())
-					setLinkedParent(null);
+					Linkable.unsetParentChild(getLinkedParent(), this);
 			}
 			else {
 				MinecartHelper.shouldSlowDown((AbstractMinecartEntity) (Object) this, world);
 			}
 
 			if(getLinkedChild() != null && getLinkedChild().isRemoved())
-				setLinkedChild(null);
+				Linkable.unsetParentChild(this, getLinkedChild());
+
+			this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()), this::collidesWith).forEach(other -> {
+				if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart)) {
+					minecart.setVelocity(getVelocity());
+				}
+
+				float damage = MinecartTweaksConfig.minecartDamage;
+
+				if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
+					Vec3d knockback = living.getVelocity().add(getVelocity().getX() * 0.9, getVelocity().length() * 0.2, getVelocity().getZ() * 0.9);
+					living.setVelocity(knockback);
+					living.velocityDirty = true;
+					living.damage(MinecartTweaks.minecart(this), damage);
+				}
+
+			});
 		}
 		else {
 			if(MinecartTweaksConfig.playerViewIsLocked) {
@@ -128,21 +140,6 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 			dropStack(new ItemStack(Items.CHAIN));
 	}
 
-	@Inject(method = "collidesWith", at = @At("HEAD"))
-	public void minecarttweaks$damageEntities(Entity other, CallbackInfoReturnable<Boolean> info) {
-		if(other instanceof AbstractMinecartEntity minecart && getLinkedParent() != null && !getLinkedParent().equals(minecart))
-			minecart.setVelocity(getVelocity());
-
-		float damage = MinecartTweaksConfig.minecartDamage;
-
-		if(damage > 0 && !world.isClient() && other instanceof LivingEntity living && living.isAlive() && !living.hasVehicle() && getVelocity().length() > 1.5) {
-			Vec3d knockback = living.getVelocity().add(getVelocity().getX() * 0.9, getVelocity().length() * 0.2, getVelocity().getZ() * 0.9);
-			living.setVelocity(knockback);
-			living.velocityDirty = true;
-			living.damage(MinecartTweaks.minecart(this), damage);
-		}
-	}
-
 	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
 	public void minecarttweaks$readNbt(NbtCompound nbt, CallbackInfo info) {
 		if(nbt.contains("ParentUuid"))
@@ -153,10 +150,10 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 
 	@Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))
 	public void minecarttweaks$writeNbt(NbtCompound nbt, CallbackInfo info) {
-		if(getLinkedParent() != null)
-			nbt.putUuid("ParentUuid", getLinkedParent().getUuid());
-		if(getLinkedChild() != null)
-			nbt.putUuid("ChildUuid", getLinkedChild().getUuid());
+		if(this.parentUuid != null)
+			nbt.putUuid("ParentUuid", this.parentUuid);
+		if(this.childUuid != null)
+			nbt.putUuid("ChildUuid", this.childUuid);
 	}
 
 	@Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(DD)D"))
@@ -165,95 +162,50 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Link
 	}
 
 	@Override
-	public ActionResult interact(PlayerEntity player, Hand hand) {
-		if(MinecartTweaksConfig.canLinkMinecarts) {
-			ItemStack stack = player.getStackInHand(hand);
+	public AbstractMinecartEntity getLinkedParent() {
+		var entity = this.world instanceof ServerWorld serverWorld && this.parentUuid != null ? serverWorld.getEntity(this.parentUuid) : this.world.getEntityById(this.parentIdClient);
+		return entity instanceof AbstractMinecartEntity abstractMinecartEntity ? abstractMinecartEntity : null;
+	}
 
-			if(player.isSneaking() && stack.isOf(Items.CHAIN)) {
-				if(world instanceof ServerWorld server) {
-					NbtCompound nbt = stack.getOrCreateNbt();
-
-					if(nbt.contains("ParentEntity") && !getUuid().equals(nbt.getUuid("ParentEntity"))) {
-						if(server.getEntity(nbt.getUuid("ParentEntity")) instanceof AbstractMinecartEntity parent) {
-							Linkable linkable = (Linkable) parent;
-							Set<Linkable> train = new HashSet<>();
-							train.add(linkable);
-
-							while((linkable = (Linkable) linkable.getLinkedParent()) instanceof Linkable && !train.contains(linkable)) {
-								train.add(linkable);
-							}
-
-							if(train.contains(this) || ((Linkable) parent).getLinkedChild() != null) {
-								player.sendMessage(Text.translatable(MinecartTweaks.MOD_ID + ".cant_link_to_engine").formatted(Formatting.RED), true);
-							}
-							else {
-								if(getLinkedParent() != null)
-									((Linkable) getLinkedParent()).setLinkedChild(null);
-
-
-								setLinkedParent(parent);
-								((Linkable) parent).setLinkedChild((AbstractMinecartEntity) (Object) this);
-							}
-						}
-						else {
-							nbt.remove("ParentEntity");
-
-							if(nbt.isEmpty())
-								stack.setNbt(null);
-						}
-
-						world.playSound(null, getX(), getY(), getZ(), SoundEvents.BLOCK_CHAIN_PLACE, SoundCategory.NEUTRAL, 1F, 1F);
-
-						if(!player.isCreative())
-							stack.decrement(1);
-
-						nbt.remove("ParentEntity");
-
-						if(nbt.isEmpty())
-							stack.setNbt(null);
-					}
-					else {
-						nbt.putUuid("ParentEntity", getUuid());
-						world.playSound(null, getX(), getY(), getZ(), SoundEvents.BLOCK_CHAIN_HIT, SoundCategory.NEUTRAL, 1F, 1F);
-					}
-				}
-
-				return ActionResult.success(true);
-			}
+	@Override
+	public void setLinkedParent(@Nullable AbstractMinecartEntity parent) {
+		if (parent != null) {
+			this.parentUuid = parent.getUuid();
+			this.parentIdClient = parent.getId();
+		} else {
+			this.parentUuid = null;
+			this.parentIdClient = -1;
 		}
 
-		return super.interact(player, hand);
+		if (!this.world.isClient()) {
+			PlayerLookup.tracking(this).forEach(player -> SyncChainedMinecartPacket.send(this.getLinkedParent(), (AbstractMinecartEntity) (Object) this, player));
+		}
 	}
 
 	@Override
-	public AbstractMinecartEntity getLinkedParent() {
-		if(world instanceof ServerWorld server && linkedParent == null && parentUuid != null && server.getEntity(parentUuid) instanceof AbstractMinecartEntity parent)
-			setLinkedParent(parent);
-
-		return linkedParent;
-	}
-
-	@Override
-	public void setLinkedParent(AbstractMinecartEntity parent) {
-		linkedParent = parent;
-
-		if(parent == null)
-			parentUuid = null;
+	public void setLinkedParentClient(int id) {
+		this.parentIdClient = id;
 	}
 
 	@Override
 	public AbstractMinecartEntity getLinkedChild() {
-		if(world instanceof ServerWorld server && linkedChild == null && childUuid != null && server.getEntity(childUuid) instanceof AbstractMinecartEntity child)
-			setLinkedChild(child);
-
-		return linkedChild;
+		var entity = this.world instanceof ServerWorld serverWorld && this.childUuid != null ? serverWorld.getEntity(this.childUuid) : this.world.getEntityById(this.childIdClient);
+		return entity instanceof AbstractMinecartEntity abstractMinecartEntity ? abstractMinecartEntity : null;
 	}
 
 	@Override
-	public void setLinkedChild(AbstractMinecartEntity child) {
-		linkedChild = child;
+	public void setLinkedChild(@Nullable AbstractMinecartEntity child) {
+		if (child != null) {
+			this.childUuid = child.getUuid();
+			this.childIdClient = child.getId();
+		} else {
+			this.childUuid = null;
+			this.childIdClient = -1;
+		}
+	}
 
-		if(child == null)
-			childUuid = null;
+	@Override
+	public void setLinkedChildClient(int id) {
+		this.childIdClient = id;
 	}
 }

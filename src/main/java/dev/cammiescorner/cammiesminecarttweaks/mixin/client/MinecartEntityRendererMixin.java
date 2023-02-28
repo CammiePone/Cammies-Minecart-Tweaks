@@ -1,7 +1,7 @@
 package dev.cammiescorner.cammiesminecarttweaks.mixin.client;
 
 import dev.cammiescorner.cammiesminecarttweaks.MinecartTweaks;
-import dev.cammiescorner.cammiesminecarttweaks.utils.Linkable;
+import dev.cammiescorner.cammiesminecarttweaks.api.Linkable;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -31,29 +31,26 @@ public abstract class MinecartEntityRendererMixin<T extends AbstractMinecartEnti
 
 	@Inject(method = "render(Lnet/minecraft/entity/vehicle/AbstractMinecartEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
 	public void minecarttweaks$render(T child, float yaw, float tickDelta, MatrixStack stack, VertexConsumerProvider provider, int light, CallbackInfo info) {
-		if(child instanceof Linkable linkable) {
-			AbstractMinecartEntity parent = linkable.getLinkedParent();
+		AbstractMinecartEntity parent = child.getLinkedParent();
+		if(parent != null) {
+			double startX = parent.getX();
+			double startY = parent.getY();
+			double startZ = parent.getZ();
+			double endX = child.getX();
+			double endY = child.getY();
+			double endZ = child.getZ();
 
-			if(parent != null) {
-				double startX = parent.getX();
-				double startY = parent.getY();
-				double startZ = parent.getZ();
-				double endX = child.getX();
-				double endY = child.getY();
-				double endZ = child.getZ();
+			float distanceX = (float) (startX - endX);
+			float distanceY = (float) (startY - endY);
+			float distanceZ = (float) (startZ - endZ);
+			float distance = child.distanceTo(parent);
 
-				float distanceX = (float) (startX - endX);
-				float distanceY = (float) (startY - endY);
-				float distanceZ = (float) (startZ - endZ);
-				float distance = child.distanceTo(parent);
+			double hAngle = Math.toDegrees(Math.atan2(endZ - startZ, endX - startX));
+			hAngle += Math.ceil(-hAngle / 360) * 360;
 
-				double hAngle = Math.toDegrees(Math.atan2(endZ - startZ, endX - startX));
-				hAngle += Math.ceil(-hAngle / 360) * 360;
+			double vAngle = Math.asin(distanceY / distance);
 
-				double vAngle = Math.asin(distanceY / distance);
-
-				renderChain(distanceX, distanceY, distanceZ, (float) hAngle, (float) vAngle, stack, provider, light);
-			}
+			renderChain(distanceX, distanceY, distanceZ, (float) hAngle, (float) vAngle, stack, provider, light);
 		}
 	}
 

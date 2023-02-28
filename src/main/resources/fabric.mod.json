@@ -29,5 +29,10 @@
 		"fabric": "*",
 		"midnightlib": ">=0.6.0",
 		"minecraft": "1.19.x"
+	},
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/class_1688": ["dev/cammiescorner/cammiesminecarttweaks/api/Linkable"]
+		}
 	}
 }
